@@ -1,5 +1,6 @@
 package com.bank.account.service;
 
+import com.bank.account.model.Role;
 import com.bank.account.model.User;
 import com.bank.account.repository.RoleRepository;
 import com.bank.account.repository.UserRepository;
@@ -12,7 +13,9 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.Optional;
+import java.util.List;
 
 @Service
 public class UserService implements UserDetailsService {
@@ -41,4 +44,25 @@ public class UserService implements UserDetailsService {
         return userFromDb.orElse(new User());
     }
 
+    public List<User> allUsers() {
+        return userRepository.findAll();
+    }
+
+    public boolean saveUser(User user) {
+        User userFromDB = userRepository.findByEmail(user.getEmail());
+
+        if (userFromDB != null) {
+            return false;
+        }
+
+        user.setRoles(Collections.singleton(
+                Role.builder()
+                .id(1L)
+                .name("ROLE_USER")
+                .build()
+        ));
+        user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
+        userRepository.save(user);
+        return true;
+    }
 }
