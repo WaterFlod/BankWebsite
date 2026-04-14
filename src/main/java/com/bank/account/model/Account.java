@@ -46,8 +46,4 @@ public class Account {
     @Version
     @Setter(AccessLevel.NONE)
     private Long version;
-
-    public enum AccountType {
-        CHECKING, SAVINGS, CREDIT
-    }
 }
