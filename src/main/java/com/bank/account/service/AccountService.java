@@ -12,6 +12,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -26,20 +28,20 @@ public class AccountService {
     public TransactionResponse createAccount(CreateAccountRequest request) {
         String accountNumber = generateAccountNumber();
 
-        User user = userService.findUserByIdentifier(request.getIdentifier());
+        User user = userService.findUserByIdentifier(request.identifier());
 
         Account account = Account.builder()
                 .accountNumber(accountNumber)
-                .type(request.getType())
+                .type(request.type())
                 .user(user)
-                .balance(request.getInitialDeposit())
+                .balance(request.initialDeposit())
                 .build();
 
         account = accountRepository.save(account);
 
         TransactionResponse response = transactionService.deposit(
                 account,
-                request.getInitialDeposit(),
+                request.initialDeposit(),
                 "Первоначальный депозит"
         );
 
@@ -48,9 +50,17 @@ public class AccountService {
     }
 
     @Transactional(readOnly = true)
-    public AccountDTO getAccount(String accountNumber) {
+    public AccountResponse getAccount(String accountNumber) {
         Account account = findAccountByNumber(accountNumber);
-        return convertToDTO(account);
+        return convertToAccountResponse(account);
+    }
+
+    @Transactional(readOnly = true)
+    public List<AccountResponse> getAllAccounts(String userId) {
+        return accountRepository.findByUserId(userId)
+                .stream()
+                .map(this::convertToAccountResponse)
+                .collect(Collectors.toList());
     }
 
     @Transactional
@@ -137,12 +147,11 @@ public class AccountService {
         return "ACC" + System.currentTimeMillis() + (int)(Math.random() * 1000);
     }
 
-    private AccountDTO convertToDTO(Account account) {
-        AccountDTO dto = new AccountDTO();
-        dto.setId(account.getId());
-        dto.setAccountNumber(account.getAccountNumber());
-        dto.setBalance(account.getBalance());
-        dto.setType(account.getType());
-        return dto;
+    private AccountResponse convertToAccountResponse(Account account) {
+        return new AccountResponse(
+                account.getAccountNumber(),
+                account.getBalance(),
+                account.getType()
+        );
     }
 }

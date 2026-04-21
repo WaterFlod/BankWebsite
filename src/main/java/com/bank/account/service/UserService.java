@@ -1,10 +1,12 @@
 package com.bank.account.service;
 
 import com.bank.account.dto.RegistrationRequest;
+import com.bank.account.exception.UserNotFoundException;
 import com.bank.account.model.Role;
 import com.bank.account.model.User;
 import com.bank.account.repository.UserRepository;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -12,6 +14,7 @@ import java.util.Optional;
 
 @Service
 @AllArgsConstructor
+@Slf4j
 public class UserService {
 
 
@@ -31,16 +34,25 @@ public class UserService {
         return user.get();
     }
 
-    public boolean registerUser(RegistrationRequest request) {
+    public User registerUser(RegistrationRequest request) {
         User user = User.builder()
-                .email(request.getEmail())
-                .password(passwordEncoder.encode(request.getPassword()))
-                .firstName(request.getFirstName())
-                .lastName(request.getLastName())
-                .phoneNumber(request.getPhoneNumber())
+                .email(request.email())
+                .firstName(request.firstName())
+                .lastName(request.lastName())
+                .password("123")
+                .phoneNumber(request.phoneNumber())
                 .role(Role.USER)
                 .build();
         userRepository.save(user);
+        log.info("Новый пользователь создан " + request.email());
+        return user;
+    }
+
+    public boolean setPassword(String email, String password) {
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new UserNotFoundException(email));
+        user.setPassword(passwordEncoder.encode(password));
+        userRepository.save(user);
+        log.info("Пароль установлен");
         return true;
     }
 }

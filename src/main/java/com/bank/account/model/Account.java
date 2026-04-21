@@ -40,10 +40,15 @@ public class Account {
     @Column(nullable = false)
     private AccountType type = AccountType.CHECKING;
 
-    @Column(nullable = false)
-    private LocalDateTime createdAt = LocalDateTime.now();
+    @Column
+    private LocalDateTime createdAt;
 
     @Version
     @Setter(AccessLevel.NONE)
     private Long version;
+
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+    }
 }

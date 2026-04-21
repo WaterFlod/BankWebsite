@@ -27,8 +27,8 @@ public class TransactionService {
     private final AccountRepository accountRepository;
 
     @Transactional(readOnly = true)
-    public List<TransactionResponse> getAccountTransaction(String accountNumber) {
-        return transactionRepository.findByAccountNumber(accountNumber)
+    public List<TransactionResponse> getAccountTransaction(Account acc) {
+        return transactionRepository.findByAccount(acc)
                 .stream()
                 .map(this::convertToTransactionResponse)
                 .collect(Collectors.toList());

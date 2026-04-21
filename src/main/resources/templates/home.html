@@ -5,13 +5,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Bank</title>
-    <!-- Google Fonts: Playfair Display + Cormorant Garamond -->
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <title>Bank | Главная</title>
+    <!-- Google Fonts -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap">
     <!-- Font Awesome 6 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="css/home.css">
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" th:href="@{/css/home.css}" type="text/css">
+    <link rel="stylesheet" th:href="@{/css/style.css}" type="text/css">
 </head>
 <body>
 
@@ -22,17 +22,14 @@
         <div class="navbar">
             <a th:href="@{/home}" class="logo">Bank</a>
             <div class="nav-links">
-                <a href="#">Карты</a>
-                <a href="#">Кредиты</a>
-                <a href="#">Накопления</a>
+                <a th:href="@{/product/debit}">Карты</a>
+                <a th:href="@{/product/credit}">Кредиты</a>
+                <a th:href="@{/product/savings}">Накопления</a>
             </div>
             <div class="username" sec:authorize="isAuthenticated()">
-                <a th:text="${username}" th:href="@{/login?error}"></a>
+                <a th:text="${username}" th:href="@{/account}"></a>
             </div>
             <div class="auth-buttons" sec:authorize="isAnonymous()">
-                <form method="get" th:action="@{/register}">
-                    <button class="btn-outline" type="submit">Стать клиентом</button>
-                </form>
                 <form method="get" th:action="@{/login}">
                     <button class="btn-primary" >Войти</button>
                 </form>
@@ -58,7 +55,7 @@
                 <div class="product-card">
                     <div class="card-header">
                         <i class="fas fa-credit-card"></i>
-                        <h3>Дебетовая карта</h3>
+                        <h3>Виртуальная карта</h3>
                     </div>
                     <div class="card-body">
                         <div class="highlight">до 10% <span>кэшбэк</span></div>
@@ -68,7 +65,9 @@
                             <li><i class="fas fa-percent"></i> Кэшбэк до 10%</li>
                             <li><i class="fas fa-shield-alt"></i> Страхование путешествий</li>
                         </ul>
-                        <button class="card-btn">Оформить карту</button>
+                        <form method="get" th:action="@{/product/debit}">
+                            <button class="card-btn">Оформить карту</button>
+                        </form>
                     </div>
                 </div>
                 <div class="product-card">
@@ -84,7 +83,9 @@
                             <li><i class="fas fa-comment"></i> Персональный финансовый помощник</li>
                             <li><i class="fas fa-rub"></i> Снятие без комиссии</li>
                         </ul>
-                        <button class="card-btn">Получить предложение</button>
+                        <form method="get" th:action="@{/product/credit}">
+                            <button class="card-btn">Получить предложение</button>
+                        </form>
                     </div>
                 </div>
                 <div class="product-card">
@@ -97,10 +98,12 @@
                         <ul class="feature-list">
                             <li><i class="fas fa-chart-line"></i> Фиксация ставки на 12 месяцев</li>
                             <li><i class="fas fa-university"></i> Капитализация ежемесячно</li>
-                            <li><i class="fas fa-hand-holding-heart"></i> Пополнение без ограничений</li>
+                            <li><i class="fas fa-hand-holding-heart"></i> Пополнение и снятие без ограничений</li>
                             <li><i class="fas fa-shield"></i> Защита капитала</li>
                         </ul>
-                        <button class="card-btn">Открыть счет</button>
+                        <form method="get" th:action="@{/product/savings}">
+                            <button class="card-btn">Открыть счет</button>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -116,6 +119,6 @@
     </div>
 </footer>
 
-<script src="js/index.js"></script>
+<script type="text/javascript" th:src="@{/js/script.js}"></script>
 </body>
 </html>

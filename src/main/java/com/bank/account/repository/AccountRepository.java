@@ -10,9 +10,7 @@ import java.util.Optional;
 @Repository
 public interface AccountRepository extends JpaRepository<Account, String> {
 
-    // Найти по номеру счёта
     Optional<Account> findByAccountNumber(String accountNumber);
 
-    // Найти по типу счёта
-    List<Account> findByType(AccountType type);
+    List<Account> findByUserId(String UserId);
 }

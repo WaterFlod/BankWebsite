@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      lang="ru" >
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Bank | Дебетовая карта</title>
+    <!-- Google Fonts -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" type="text/css">
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" type="text/css">
+    <link rel="stylesheet" th:href="@{/css/debit.css}" type="text/css">
+    <link rel="stylesheet" th:href="@{/css/style.css}" type="text/css">
+</head>
+<body>
+
+<canvas id="wave-canvas"></canvas>
+
+<header class="header">
+    <div class="container">
+        <div class="navbar">
+            <a th:href="@{/home}" class="logo">Bank</a>
+            <div class="nav-links">
+                <a th:href="@{/product/debit}">Карты</a>
+                <a th:href="@{/product/credit}">Кредиты</a>
+                <a th:href="@{/product/savings}">Накопления</a>
+            </div>
+            <div class="username" sec:authorize="isAuthenticated()">
+                <a th:text="${username}" th:href="@{/account}"></a>
+            </div>
+            <div class="auth-buttons" sec:authorize="isAnonymous()">
+                <form method="get" th:action="@{/login}">
+                    <button class="btn-primary" >Войти</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</header>
+
+<main>
+    <div class="container">
+        <div class="card-hero">
+            <h1>Виртуальная дебетовая карта</h1>
+            <p>Ежедневные преимущества, кэшбэк и свобода тратить без ограничений</p>
+        </div>
+
+        <div class="card-showcase">
+            <div class="card-visual">
+                <div class="card-platinum">
+                    <div class="card-chip"></div>
+                    <div class="card-number">****  ****  ****  0159</div>
+                    <div class="card-holder">
+                        <span>VALID THRU 12/28</span>
+                        <span>WATER FLOD</span>
+                    </div>
+                    <div class="card-badge"><i class="fas fa-credit-card"></i> DEBIT</div>
+                </div>
+            </div>
+            <div class="card-features-list">
+                <h3>Преимущества нашей карты</h3>
+                <div class="feature-grid">
+                    <div class="feature-item">
+                        <i class="fas fa-percent"></i>
+                        <div class="feature-text"><h4>До 10% кэшбэк</h4><p>В категориях на выбор</p></div>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-globe"></i>
+                        <div class="feature-text"><h4>Бесплатные снятия</h4><p>Во всех банкоматах мира без комиссии</p></div>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-chart-line"></i>
+                        <div class="feature-text"><h4>Бесплатное обслуживание</h4><p>Навсегда и без условий</p></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="benefits-section">
+            <h2 class="section-title">Премиальные возможности</h2>
+            <div class="benefits-grid">
+                <div class="benefit-card"><i class="fas fa-concierge-bell"></i><h4>Поддержка 24/7</h4><p>Личный помощник в любой точке мира</p></div>
+                <div class="benefit-card"><i class="fas fa-plane"></i><h4>Приоритетный пассажир</h4><p>Доступ в бизнес-залы аэропортов</p></div>
+                <div class="benefit-card"><i class="fas fa-shield-alt"></i><h4>Страхование путешествий</h4><p>Покрытие до 200 000$</p></div>
+                <div class="benefit-card"><i class="fas fa-mobile-alt"></i><h4>Эксклюзивное приложение</h4><p>Управление капиталом в одно касание</p></div>
+            </div>
+        </div>
+
+        <div class="order-section">
+            <h2 class="form-title">Оформить виртуальную дебетовую карту</h2>
+
+            <!-- Форма для авторизированного -->
+            <form class="order-form" sec:authorize="isAuthenticated()">
+                <div class="input-group">
+                    <label>Первоначальный депозит</label>
+                    <input type="text" placeholder="10000" required>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" required>
+                    <label>Я соглашаюсь с условиями обслуживания и даю согласие на обработку данных</label>
+                </div>
+                <button type="submit" class="order-btn"> Отправить заявку</button>
+            </form>
+
+            <!-- Форма для анонима -->
+            <form class="order-form" th:object="${request}" method="post" th:action="@{/product/debit}" sec:authorize="isAnonymous()">
+
+                <div th:if="${error}" th:text="${error}" class="error"></div>
+
+                <div class="name-row">
+                    <div class="input-group">
+                        <label>Имя</label>
+                        <input type="text" th:field="*{firstName}" placeholder="Александр" required>
+                    </div>
+                    <div class="input-group">
+                        <label>Фамилия</label>
+                        <input type="text" th:field="*{lastName}" placeholder="Александров" required>
+                    </div>
+                </div>
+                <div class="input-group">
+                    <label>Email</label>
+                    <input type="email" th:field="*{email}" placeholder="name@bank.ru" required>
+                </div>
+                <div class="input-group">
+                    <label>Телефон</label>
+                    <input type="tel" th:field="*{phoneNumber}" placeholder="+7 (___) ___-__-__" required>
+                </div>
+                <div class="input-group">
+                    <label>Первоначальный депозит</label>
+                    <input type="text" th:field="*{initialDeposit}" placeholder="10000" required>
+                </div>
+                <div class="checkbox-group">
+                    <input type="checkbox" required>
+                    <label>Я соглашаюсь с условиями обслуживания и даю согласие на обработку данных</label>
+                </div>
+                <button type="submit" class="order-btn">Открыть новый счет</button>
+            </form>
+        </div>
+    </div>
+</main>
+
+<footer class="footer">
+    <div class="container">
+        <div class="copyright">
+            © Bank — является вымышленным продуктом.
+        </div>
+    </div>
+</footer>
+
+<script type="text/javascript" th:src="@{/js/script.js}"></script>
+</body>
+</html>

@@ -23,7 +23,7 @@ public class Transaction {
     private String id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "account_accountNumber", nullable = false)
+    @JoinColumn(name = "account_id", nullable = false)
     private Account account;
 
     @Column(nullable = false)
@@ -36,8 +36,8 @@ public class Transaction {
     @Column(nullable = false)
     private String description;
 
-    @Column(nullable = false)
-    private LocalDateTime timestamp = LocalDateTime.now();
+    @Column
+    private LocalDateTime timestamp;
 
     @Column(nullable = false)
     private BigDecimal balanceAfter;
@@ -45,4 +45,9 @@ public class Transaction {
     @Version
     @Setter(AccessLevel.NONE)
     private Long version;
+
+    @PrePersist
+    protected void onCreate() {
+        timestamp = LocalDateTime.now();
+    }
 }

@@ -8,8 +8,5 @@ import java.util.List;
 
 @Repository
 public interface TransactionRepository extends JpaRepository<Transaction, String> {
-
-    List<Transaction> findByAccountOrderByTimestamp(Account account);
-
-    List<Transaction> findByAccountNumber(String accountNumber);
+    List<Transaction> findByAccount(Account account);
 }
