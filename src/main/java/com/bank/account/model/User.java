@@ -3,6 +3,7 @@ package com.bank.account.model;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
+import java.util.List;
 
 
 @Entity
@@ -39,6 +40,9 @@ public class User {
 
     @Column(nullable = false)
     private String lastName;
+
+    @OneToMany(mappedBy = "user")
+    private List<Account> accounts;
 
     @Enumerated(EnumType.STRING)
     private Role role;

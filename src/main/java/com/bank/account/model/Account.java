@@ -5,6 +5,7 @@ import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "accounts")
@@ -24,9 +25,10 @@ public class Account {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
-    @EqualsAndHashCode.Exclude
-    @ToString.Exclude
     private User user;
+
+    @OneToMany(mappedBy = "account")
+    private List<Transaction> transactions;
 
     @Column(unique = true, nullable = false)
     @EqualsAndHashCode.Include

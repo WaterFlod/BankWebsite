@@ -12,6 +12,7 @@ import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -33,7 +34,10 @@ public class ProductController {
     private final CustomUserDetailsService userDetailsService;
 
     @GetMapping("/debit")
-    public String debitAccount(Model model) {
+    public String debitAccount(Authentication auth, Model model) {
+        if (auth != null) {
+            model.addAttribute("username", auth.getName());
+        }
         model.addAttribute("request", new RegistrationDebitRequest());
         return "debit";
     }

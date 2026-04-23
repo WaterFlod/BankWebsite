@@ -86,24 +86,11 @@
             </div>
         </div>
 
-        <div class="order-section">
+        <div class="order-section" sec:authorize="isAnonymous()">
             <h2 class="form-title">Оформить виртуальную дебетовую карту</h2>
 
-            <!-- Форма для авторизированного -->
-            <form class="order-form" sec:authorize="isAuthenticated()">
-                <div class="input-group">
-                    <label>Первоначальный депозит</label>
-                    <input type="text" placeholder="10000" required>
-                </div>
-                <div class="checkbox-group">
-                    <input type="checkbox" required>
-                    <label>Я соглашаюсь с условиями обслуживания и даю согласие на обработку данных</label>
-                </div>
-                <button type="submit" class="order-btn"> Отправить заявку</button>
-            </form>
-
             <!-- Форма для анонима -->
-            <form class="order-form" th:object="${request}" method="post" th:action="@{/product/debit}" sec:authorize="isAnonymous()">
+            <form class="order-form" th:object="${request}" method="post" th:action="@{/product/debit}">
 
                 <div th:if="${error}" th:text="${error}" class="error"></div>
 

@@ -19,8 +19,5 @@ public class SecurityUtils {
         Object principal = authentication.getPrincipal();
 
         return ((UserDetailsImpl) principal).getId();
-
-
-
     }
 }

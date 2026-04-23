@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      lang="ru" >
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Bank | Личный кабинет</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" th:href="@{/css/account.css}" type="text/css">
+    <link rel="stylesheet" th:href="@{/css/style.css}" type="text/css">
+</head>
+<body>
+
+<canvas id="wave-canvas"></canvas>
+
+<header class="header">
+    <div class="container">
+        <div class="navbar">
+            <a th:href="@{/home}" class="logo">Bank</a>
+            <div class="nav-links">
+                <a th:href="@{/product/debit}">Карты</a>
+                <a th:href="@{/product/credit}">Кредиты</a>
+                <a th:href="@{/product/savings}">Накопления</a>
+            </div>
+            <div class="username" sec:authorize="isAuthenticated()">
+                <a th:text="${username}" th:href="@{/account}"></a>
+            </div>
+            <div class="auth-buttons" sec:authorize="isAnonymous()">
+                <form method="get" th:action="@{/login}">
+                    <button class="btn-primary" >Войти</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</header>
+
+<main>
+    <div class="container">
+        <div class="dashboard-header">
+            <div class="section-title">
+                <i class="fas fa-wallet"></i> Ваши счета
+            </div>
+            <div class="total-balance">
+                <div class="label">Общий баланс всех счетов</div>
+                <div class="amount"><span th:text="${amount}"></span> ₽</div>
+            </div>
+        </div>
+
+        <div class="accounts-section">
+            <div class="accounts-grid">
+                <div class="account-card" th:each="acc : ${accounts}">
+                    <div class="account-info">
+                        <div class="account-details">
+                            <div class="account-number">
+                                <span th:text="${acc.accountNumber}"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="account-balance">
+                        <div class="balance-amount"><span th:text="${acc.balance}"></span> ₽</div>
+                        <div class="balance-label">доступно</div>
+                    </div>
+                    <div class="account-actions">
+                        <form methods="get" th:action="@{'/account/' + ${acc.accountNumber} + '/deposit'}">
+                            <button class="action-btn"><i class="fas fa-plus-circle"></i> Пополнить</button>
+                        </form>
+                        <button class="action-btn"><i class="fas fa-exchange-alt"></i> Перевести</button>
+                        <button class="action-btn"><i class="fas fa-download"></i> Выписка</button>
+                    </div>
+                </div>
+            </div>
+            <form method="get" th:action="@{/account/open-account}">
+                <button class="open-btn" >Открыть новый счет</button>
+            </form>
+        </div>
+
+        <div class="recent-section">
+            <div class="recent-title">
+                <i class="fas fa-history"></i>Последние операции
+            </div>
+            <div class="transaction-list" th:each="trnsc : ${transactions}">
+                <div class="transaction-item">
+                    <div class="transaction-info">
+                        <div>
+                            <div class="transaction-desc" th:text="${trnsc.description}"></div>
+                            <div class="transaction-date" th:text="${trnsc.timestamp}"></div>
+                        </div>
+                    </div>
+                    <div class="transaction-amount" th:switch="${trnsc.type.name()}">
+                        <div class="deposit" th:case="'DEPOSIT'">
+                            +<span th:text="${trnsc.amount}"></span> ₽
+                        </div>
+                        <div class="deposit" th:case="'TRANSFER_OUT'">
+                            +<span th:text="${trnsc.amount}"></span> ₽
+                        </div>
+                        <div class="withdrawal" th:case="'WITHDRAWAL'">
+                            -<span th:text="${trnsc.amount}"></span> ₽
+                        </div>
+                        <div class="withdrawal" th:case="'TRANSFER_IN'">
+                            -<span th:text="${trnsc.amount}"></span> ₽
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer class="footer">
+    <div class="container">
+        <div class="copyright">
+            © Bank — является вымышленным продуктом.
+        </div>
+    </div>
+</footer>
+
+<script type="text/javascript" th:src="@{/js/script.js}"></script>
+</body>
+</html>

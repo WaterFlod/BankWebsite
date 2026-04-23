@@ -10,10 +10,14 @@ import com.bank.account.repository.AccountRepository;
 import com.bank.account.repository.TransactionRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -26,12 +30,21 @@ public class TransactionService {
 
     private final AccountRepository accountRepository;
 
-    @Transactional(readOnly = true)
     public List<TransactionResponse> getAccountTransaction(Account acc) {
         return transactionRepository.findByAccount(acc)
                 .stream()
                 .map(this::convertToTransactionResponse)
                 .collect(Collectors.toList());
+    }
+
+    public List<TransactionResponse> getLastTransaction(String userId) {
+        Pageable topTen = PageRequest.of(0, 10, Sort.unsorted());
+
+        List<Transaction> transactions = transactionRepository.findTop10ByUserId(userId, topTen);
+
+        return transactions.stream()
+                .map(this::convertToTransactionResponse)
+                .toList();
     }
 
     @Transactional
@@ -99,9 +112,10 @@ public class TransactionService {
     private TransactionResponse convertToTransactionResponse(Transaction transaction) {
         TransactionResponse dto = new TransactionResponse(
                 transaction.getAccount().getAccountNumber(),
+                transaction.getDescription(),
                 transaction.getAmount(),
                 transaction.getType(),
-                transaction.getTimestamp(),
+                (DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss")).format(transaction.getTimestamp()),
                 transaction.getBalanceAfter()
         );
 

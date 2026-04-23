@@ -6,8 +6,9 @@ import java.time.LocalDateTime;
 
 public record TransactionResponse (
     String accountNumber,
+    String description,
     BigDecimal amount,
     TransactionType type,
-    LocalDateTime timestamp,
+    String timestamp,
     BigDecimal balanceAfter
 ){}
