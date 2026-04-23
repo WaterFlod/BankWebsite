@@ -63,4 +63,23 @@ public class AccountController {
         accountService.deposit(accountNumber, request);
         return "redirect:/account";
     }
+
+    @GetMapping("/{accountNumber}/transfer")
+    public String transferForm(Authentication auth, Model model) {
+        model.addAttribute("username", auth.getName());
+        model.addAttribute("request", new TransferRequest());
+
+        return "transfer";
+    }
+
+    @PostMapping("/{accountNumber}/transfer")
+    public String transfer(@PathVariable("accountNumber") String accountNumber,
+                           @Valid @ModelAttribute("request") TransferRequest request,
+                           Authentication auth, Model model) {
+        request.setFromAccountNumber(accountNumber);
+
+        accountService.transfer(request);
+
+        return "redirect:/account";
+    }
 }

@@ -66,7 +66,9 @@
                         <form methods="get" th:action="@{'/account/' + ${acc.accountNumber} + '/deposit'}">
                             <button class="action-btn"><i class="fas fa-plus-circle"></i> Пополнить</button>
                         </form>
-                        <button class="action-btn"><i class="fas fa-exchange-alt"></i> Перевести</button>
+                        <form methods="get" th:action="@{'/account/' + ${acc.accountNumber} + '/transfer'}">
+                            <button class="action-btn"><i class="fas fa-exchange-alt"></i> Перевести</button>
+                        </form>
                         <button class="action-btn"><i class="fas fa-download"></i> Выписка</button>
                     </div>
                 </div>

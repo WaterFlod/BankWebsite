@@ -2,10 +2,12 @@ package com.bank.account.dto;
 
 import jakarta.validation.constraints.*;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 
 @Data
+@NoArgsConstructor
 public class TransferRequest {
 
     @NotBlank(message = "Счёт отправителя должен быть указан")
@@ -17,6 +19,4 @@ public class TransferRequest {
     @NotNull(message = "Сумма должна быть указана")
     @Positive(message = "Сумма должна быть больше нуля")
     private BigDecimal amount;
-
-    private String description = "Transfer";
 }
