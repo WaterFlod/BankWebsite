@@ -21,27 +21,6 @@
 - **Docker** и **Docker Compose**
 - **Git**
 
-##  Быстрый старт
-
-### 1. Клонирование репозитория
-
-```bash
-git clone https://github.com/ваш-username/bank-account-service.git
-cd bank-account-service
-```
-
-### 2. Запуск приложения
-
-```bash
-# Запуск 
-docker-compose up -d
-
-# Проверка запущенных контейнеров
-docker-compose ps
-```
-
-Приложение будет доступно по адресу: http://localhost:8080
-
 ## База данных
 
 ### Схема данных
@@ -60,18 +39,19 @@ user          -- Информация о пользователях
 
 accounts          -- Информация о счетах
 ├── id (PK)
+├── user_id (FK) 
 ├── account_number (UNIQUE)
-├── owner_name
 ├── balance
-├── type (CHECKING/SAVINGS/CREDIT)
+├── type (ENUM)
 └── created_at
 
 transactions      -- История транзакций
-├── id (PK, UUID)
+├── id (PK)
 ├── account_id (FK)
 ├── amount
-├── type (DEPOSIT/WITHDRAWAL/TRANSFER)
+├── type (ENUM)
 ├── description
+├── balance_after
 └── timestamp
 ```
 
@@ -79,72 +59,45 @@ transactions      -- История транзакций
 
 ### Публичные страницы
 
-| Метод  | Endpoint    | Описание                    |
-|--------|-------------|-----------------------------|
-| `GET`  | `/`         | Редирект на '/home'         |
-| `GET`  | `/home`     | Главная страница            |
-| `GET`  | `/register` | Страница регистрации        |
-| `POST` | `/register`    | Обработка формы регистрации |
-| `GET`  | `/login`    | Страница авторизации        |
-| `POST`  | `/login`    | Обработка формы авторизации |
+| Метод  | Endpoint | Описание                         |
+|--------|----------|----------------------------------|
+| `GET`  | `/`      | Редирект на '/home'              |
+| `GET`  | `/home`  | Главная страница                 |
+| `GET`  | `/debit` | Страница расчетного счета        |
+| `GET`  | `/login` | Страница авторизации             |
 
 ### Страницы для авторизированных пользователей
 
-| Метод | Endpoint | Описание |
-|-------|----------|--|
+| Метод  | Endpoint                               | Описание                         |
+|--------|----------------------------------------|----------------------------------|
+| `GET`  | `/set-password`                        | Форма установки пароля           |
+| `GET`  | `/account`                             | Возвращает страницу счетов       |
+| `GET`  | `/account/open-account`                | Форма открытия нового счета      |
+| `GET`  | `/account/{accountNumber}/deposit`     | Форма депозита                   |
+| `GET`  | `/account/{accountNumber}/transfer`    | Форма перевода                   |
+| `GET`  | `/account/{accountNumber}/transaction` | История транзакций               |
 
-
-## 📁 Структура проекта
+##  Структура проекта
 
 ```
 src/main/java/com/bank/account/
-├── BankAccountServiceApplication.java # Главный файл
-├── controller/         # Контроллеры
-│   ├── AccountController.java
-│   ├── AuthController.java
-│   └── HomeController.java
-├── service/           # Бизнес-логика
-│   ├── AccountService.java
-│   ├── CustomUserDetailsService.java
-│   └── UserService.java
-├── repository/        # Доступ к данным
-│   ├── AccountRepository.java
-│   ├── TransactionRepository.java
-│   └── UserRepository.java 
-├── model/             # Сущности JPA
-│   ├── Account.java
-│   ├── Role.java
-│   ├── Transaction.java
-│   └── User.java
-├── dto/               # Data Transfer Objects
-│   ├── AccountDTO.java
-│   ├── CreateAccountRequest.java
-│   ├── ErrorResponse.java
-│   ├── RegistrationRequest.java
-│   ├── TransactionDTO.java
-│   ├── TransactionRequest.java
-│   ├── TransferRequest.java
-│   └── TransferResultDTO.java
-└── security/            # Безопасность
-    ├── SecurityConfig.java
+├── BankAccountServiceApplication.java  # Главный файл
+├── controller/                         # Контроллеры
+├── service/                            # Бизнес-логика
+├── repository/                         # Доступ к данным
+├── model/                              # Сущности JPA
+├── dto/                                # Data Transfer Objects
+└── security/                           # Безопасность
 
 src/main/resources/
 ├── static/ 
-│   ├── css/
-│   │   ├── home.css
-│   │   ├── login.css
-│   │   ├── register.css
-│   │   └── style.css
-│   ├── js/
-│   │   └── index.js
-├── templates/
-│   ├── home.html
-│   ├── login.html
-│   └── register.html
-├── application.yml          # Основная конфигурация
+│   ├── css/                            # Стили шаблонов
+│   ├── js/                             # Анимация canvas
+├── templates/                          # Шаблоны thymeleaf
+├── application.yml                     # Основная конфигурация
 ```
 
-## 📞 Контакты
+##  Контакты
 
 Матвей Андреевич - [@waterflod](https://t.me/waterflod) - mse25019@gmail.com
 
