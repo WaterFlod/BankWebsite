@@ -66,7 +66,7 @@ body {
     font-weight: 500;
     color: transparent;
     transition: color 0.25s ease;
-    font-size: 1rem;
+    font-size: 1.1rem;
     letter-spacing: 0.3px;
     background: linear-gradient(135deg, #E5E4E2, #D4AF37, #C0C0C0);
     background-clip: text;
@@ -133,6 +133,11 @@ body {
      transform: translateY(-2px);
      box-shadow: 0 8px 18px rgba(212, 175, 55, 0.4);
      background: linear-gradient(115deg, #E5C45E, #CF9F2E);
+}
+
+.logout {
+    display: inline-block;
+    margin-left: 20px;
 }
 
 .footer {

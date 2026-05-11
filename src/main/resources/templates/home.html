@@ -28,6 +28,9 @@
             </div>
             <div class="username" sec:authorize="isAuthenticated()">
                 <a th:text="${username}" th:href="@{/account}"></a>
+                <form method="post" th:action="@{/logout}" class="logout">
+                    <button class="btn-outline" type="submit">Выйти</button>
+                </form>
             </div>
             <div class="auth-buttons" sec:authorize="isAnonymous()">
                 <form method="get" th:action="@{/login}">
