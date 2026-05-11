@@ -101,7 +101,7 @@ src/main/resources/
 
 Матвей Андреевич - [@waterflod](https://t.me/waterflod) - mse25019@gmail.com
 
-Ссылка на проект: [https://github.com/WaterFlod/BankAccountManagmentService](https://github.com/WaterFlod/BankAccountManagmentService)
+Ссылка на проект: [https://github.com/WaterFlod/BankWebsite](https://github.com/WaterFlod/BankWebsite)
 
 ---
 
