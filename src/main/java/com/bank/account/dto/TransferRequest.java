@@ -10,13 +10,10 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 public class TransferRequest {
 
-    @NotBlank(message = "Счёт отправителя должен быть указан")
     private String fromAccountNumber;
 
-    @NotBlank(message = "Счёт получателя должен быть указан")
     private String toAccountNumber;
 
-    @NotNull(message = "Сумма должна быть указана")
     @Positive(message = "Сумма должна быть больше нуля")
     private BigDecimal amount;
 }

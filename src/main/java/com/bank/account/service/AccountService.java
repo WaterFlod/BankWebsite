@@ -111,7 +111,6 @@ public class AccountService {
             throw new InsufficientFundsException(fromAccount.getAccountNumber(), fromAccount.getBalance(), request.getAmount());
         }
 
-        // Снимаем со счёта отправителя
         BigDecimal fromNewBalance = fromAccount.getBalance().subtract(request.getAmount());
         fromAccount.setBalance(fromNewBalance);
         accountRepository.save(fromAccount);
@@ -119,15 +118,15 @@ public class AccountService {
         TransferResponse response = transactionService.transferFrom(
                 fromAccount,
                 toAccount.getAccountNumber(),
-                request.getAmount()
+                request.getAmount(),
+                fromNewBalance
         );
 
-        // Добавляем на счёт получателя
         BigDecimal toNewBalance = toAccount.getBalance().add(request.getAmount());
         toAccount.setBalance(toNewBalance);
         accountRepository.save(toAccount);
 
-        transactionService.transferTo(toAccount, fromAccount.getAccountNumber(), request.getAmount());
+        transactionService.transferTo(toAccount, fromAccount.getAccountNumber(), request.getAmount(), toNewBalance);
 
         log.info("Перевод выполнен: {} -> {}, сумма: {}",
                 fromAccount.getAccountNumber(),

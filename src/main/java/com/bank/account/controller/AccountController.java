@@ -1,6 +1,8 @@
 package com.bank.account.controller;
 
 import com.bank.account.dto.*;
+import com.bank.account.exception.AccountNotFoundException;
+import com.bank.account.exception.InsufficientFundsException;
 import com.bank.account.model.AccountType;
 import com.bank.account.security.SecurityUtils;
 import com.bank.account.service.AccountService;
@@ -11,6 +13,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
@@ -86,9 +89,14 @@ public class AccountController {
     }
 
     @GetMapping("/{accountNumber}/transfer")
-    public String transferForm(Authentication auth, Model model) {
+    public String transferForm(@PathVariable String accountNumber,
+                               Authentication auth, Model model) {
         model.addAttribute("username", auth.getName());
-        model.addAttribute("request", new TransferRequest());
+        model.addAttribute("accountNumber", accountNumber);
+
+        TransferRequest request = new TransferRequest();
+        request.setFromAccountNumber(accountNumber);
+        model.addAttribute("request", request);
 
         return "transfer";
     }
@@ -96,12 +104,31 @@ public class AccountController {
     @PostMapping("/{accountNumber}/transfer")
     public String transfer(@PathVariable("accountNumber") String accountNumber,
                            @Valid @ModelAttribute("request") TransferRequest request,
+                           BindingResult bindingResult,
                            Authentication auth, Model model) {
+
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("username", auth.getName());
+            model.addAttribute("accountNumber", accountNumber);
+            return "transfer";
+        }
+
         request.setFromAccountNumber(accountNumber);
 
-        accountService.transfer(request);
-
-        return "redirect:/account";
+        try {
+            accountService.transfer(request);
+            return "redirect:/account";
+        } catch (AccountNotFoundException e) {
+            model.addAttribute("username", auth.getName());
+            model.addAttribute("accountNumber", accountNumber);
+            model.addAttribute("error", "Счет получателя не найден: " + request.getToAccountNumber());
+            return "transfer";
+        } catch (InsufficientFundsException e) {
+            model.addAttribute("username", auth.getName());
+            model.addAttribute("accountNumber", accountNumber);
+            model.addAttribute("error", "Недостаточно средств на счете");
+            return "transfer";
+        }
     }
 
     @GetMapping("/{accountNumber}/transaction")

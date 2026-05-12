@@ -78,12 +78,13 @@ public class TransactionService {
     }
 
     @Transactional
-    public TransferResponse transferFrom(Account fromAccount, String toAccountNumber, BigDecimal amount) {
+    public TransferResponse transferFrom(Account fromAccount, String toAccountNumber, BigDecimal amount, BigDecimal balance) {
         Transaction transfer = Transaction.builder()
                 .account(fromAccount)
                 .amount(amount)
                 .type(TransactionType.TRANSFER_OUT)
                 .description("Перевод на счет: " + toAccountNumber)
+                .balanceAfter(balance)
                 .build();
 
         transactionRepository.save(transfer);
@@ -98,11 +99,12 @@ public class TransactionService {
     }
 
     @Transactional
-    public void transferTo(Account toAccount, String fromAccountNumber, BigDecimal amount) {
+    public void transferTo(Account toAccount, String fromAccountNumber, BigDecimal amount, BigDecimal balance) {
         Transaction transfer = Transaction.builder()
                 .account(toAccount)
                 .amount(amount)
                 .type(TransactionType.TRANSFER_IN)
+                .balanceAfter(balance)
                 .description("Перевод с счета: " + fromAccountNumber)
                 .build();
 

@@ -69,6 +69,14 @@
                         <input type="text" th:field="*{toAccountNumber}" placeholder="ACC123123123123" required>
                     </div>
 
+                    <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>
+
+                    <div th:if="${#fields.hasErrors('*')}" class="alert alert-danger">
+                        <ul>
+                            <li th:each="err : ${#fields.errors('*')}" th:text="${err}"></li>
+                        </ul>
+                    </div>
+
                     <button type="submit" class="btn">Перевести</button>
                 </form>
             </div>
