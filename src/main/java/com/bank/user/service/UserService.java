@@ -25,16 +25,14 @@ public class UserService {
         return userRepository.existsByEmail(email);
     }
 
-    public boolean existsUserByPhoneNumber(String phoneNumber) {
-        return userRepository.existsByPhoneNumber(phoneNumber);
-    }
+    public boolean existsUserByPhoneNumber(String phoneNumber) { return userRepository.existsByPhoneNumber(phoneNumber); }
 
     public User findUserByIdentifier(String identifier) {
         Optional<User> user = userRepository.findByEmail(identifier);
         return user.get();
     }
 
-    public User registerUser(RegistrationRequest request) {
+    public void registerUser(RegistrationRequest request) {
         User user = User.builder()
                 .email(request.email())
                 .firstName(request.firstName())
@@ -43,16 +41,17 @@ public class UserService {
                 .phoneNumber(request.phoneNumber())
                 .role(Role.USER)
                 .build();
+
         userRepository.save(user);
-        log.info("Новый пользователь создан " + request.email());
-        return user;
+
+        log.info("Новый пользователь создан {}", request.email());
+
     }
 
-    public boolean setPassword(String email, String password) {
+    public void setPassword(String email, String password) {
         User user = userRepository.findByEmail(email).orElseThrow(() -> new UserNotFoundException(email));
         user.setPassword(passwordEncoder.encode(password));
         userRepository.save(user);
         log.info("Пароль установлен");
-        return true;
     }
 }

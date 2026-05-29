@@ -44,8 +44,9 @@ public class User {
     @OneToMany(mappedBy = "user")
     private List<Account> accounts;
 
+    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    private Role role;
+    private Role role = Role.USER;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
