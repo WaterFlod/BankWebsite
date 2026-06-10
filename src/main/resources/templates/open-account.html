@@ -22,7 +22,7 @@
         <div class="navbar">
             <a th:href="@{/home}" class="logo">Bank</a>
             <div class="nav-links">
-                <a th:href="@{/product/debit}">Карты</a>
+                <a th:href="@{/product/checking}">Карты</a>
                 <a th:href="@{/product/credit}">Кредиты</a>
                 <a th:href="@{/product/savings}">Накопления</a>
             </div>
@@ -58,8 +58,12 @@
                     <div class="error" th:if="${param.error}" th:text="${error}" ></div>
 
                     <div class="input-group">
-                        <label><i class="fas fa-money"></i> Сумма первоначального депозита</label>
-                        <input type="text" th:field="*{amount}" placeholder="0" required>
+                        <label>Тип счета</label>
+                        <select th:field="*{type}">
+                            <option value="Checking">Расчетный счет</option>
+                            <option value="Savings">Накопительный счет</option>
+                            <option value="Credit">Кредитный счет</option>
+                        </select>
                     </div>
 
                     <button type="submit" class="btn">Открыть</button>

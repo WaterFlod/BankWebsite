@@ -20,7 +20,7 @@
         <div class="navbar">
             <a th:href="@{/home}" class="logo">Bank</a>
             <div class="nav-links">
-                <a th:href="@{/product/debit}">Карты</a>
+                <a th:href="@{/product/checking}">Карты</a>
                 <a th:href="@{/product/credit}">Кредиты</a>
                 <a th:href="@{/product/savings}">Накопления</a>
             </div>
@@ -63,13 +63,13 @@
                         <div class="deposit" th:case="'DEPOSIT'">
                             +<span th:text="${trnsc.amount}"></span> ₽
                         </div>
-                        <div class="deposit" th:case="'TRANSFER_OUT'">
+                        <div class="deposit" th:case="'TRANSFER_IN'">
                             +<span th:text="${trnsc.amount}"></span> ₽
                         </div>
                         <div class="withdrawal" th:case="'WITHDRAWAL'">
                             -<span th:text="${trnsc.amount}"></span> ₽
                         </div>
-                        <div class="withdrawal" th:case="'TRANSFER_IN'">
+                        <div class="withdrawal" th:case="'TRANSFER_OUT'">
                             -<span th:text="${trnsc.amount}"></span> ₽
                         </div>
                     </div>

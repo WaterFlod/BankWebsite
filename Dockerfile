@@ -1,25 +1,22 @@
 FROM maven:3.9.11-eclipse-temurin-25 AS build
 WORKDIR /app
 
-# Копируем pom.xml для кэширования зависимостей
 COPY pom.xml .
 
-# Скачиваем зависимости (кешируются в слое Docker)
 RUN mvn dependency:go-offline -B
 
-# Копируем исходный код
 COPY src ./src
 
-# Собираем приложение
-RUN mvn clean package -DskipTests
+RUN mvn clean package
 
-FROM eclipse-temurin:25-jre-alpine
+FROM eclipse-temurin:25-jre
 WORKDIR /app
-COPY --from=build /app/target/*.jar app.jar
-EXPOSE 8080
 
-# Добавляем non-root пользователя для безопасности
-RUN addgroup -S spring && adduser -S spring -G spring
+COPY --from=build /app/target/app.jar app.jar
+
+RUN groupadd -r spring && useradd -r -g spring -d /app -s /bin/false spring
 USER spring:spring
+
+EXPOSE 8080
 
 ENTRYPOINT ["java", "-jar", "app.jar"]

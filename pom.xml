@@ -111,6 +111,7 @@
     </dependencies>
 
     <build>
+        <finalName>app</finalName>
         <plugins>
             <!-- Spring Boot plugin -->
             <plugin>

@@ -22,7 +22,7 @@
         <div class="navbar">
             <a th:href="@{/home}" class="logo">Bank</a>
             <div class="nav-links">
-                <a th:href="@{/product/debit}">Карты</a>
+                <a th:href="@{/product/checking}">Карты</a>
                 <a th:href="@{/product/credit}">Кредиты</a>
                 <a th:href="@{/product/savings}">Накопления</a>
             </div>
@@ -58,7 +58,7 @@
                 <div class="product-card">
                     <div class="card-header">
                         <i class="fas fa-credit-card"></i>
-                        <h3>Виртуальная карта</h3>
+                        <h3>Расчетный счет</h3>
                     </div>
                     <div class="card-body">
                         <div class="highlight">до 10% <span>кэшбэк</span></div>
@@ -68,8 +68,8 @@
                             <li><i class="fas fa-percent"></i> Кэшбэк до 10%</li>
                             <li><i class="fas fa-shield-alt"></i> Страхование путешествий</li>
                         </ul>
-                        <form method="get" th:action="@{/product/debit}">
-                            <button class="card-btn">Оформить карту</button>
+                        <form method="get" th:action="@{/product/checking}">
+                            <button class="card-btn">Оформить расчетный счет</button>
                         </form>
                     </div>
                 </div>
@@ -81,8 +81,8 @@
                     <div class="card-body">
                         <div class="highlight">до 180 дней <span>льготный</span></div>
                         <ul class="feature-list">
-                            <li><i class="fas fa-gem"></i> Лимит до 5 000 000 ₽</li>
-                            <li><i class="fas fa-clock"></i> Индивидуальная ставка от 7%</li>
+                            <li><i class="fas fa-gem"></i> Лимит до 500 000 ₽</li>
+                            <li><i class="fas fa-clock"></i> Индивидуальная ставка 20% годовых</li>
                             <li><i class="fas fa-comment"></i> Персональный финансовый помощник</li>
                             <li><i class="fas fa-rub"></i> Снятие без комиссии</li>
                         </ul>
@@ -97,7 +97,7 @@
                         <h3>Накопительный счет</h3>
                     </div>
                     <div class="card-body">
-                        <div class="highlight">до 14% <span>годовых</span></div>
+                        <div class="highlight"> 5% <span>годовых</span></div>
                         <ul class="feature-list">
                             <li><i class="fas fa-chart-line"></i> Фиксация ставки на 12 месяцев</li>
                             <li><i class="fas fa-university"></i> Капитализация ежемесячно</li>

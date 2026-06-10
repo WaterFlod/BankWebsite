@@ -1,10 +1,9 @@
-package com.bank.account.service;
+package com.bank.user.service;
 
-import com.bank.account.dto.RegistrationRequest;
-import com.bank.account.exception.UserNotFoundException;
-import com.bank.account.model.Role;
-import com.bank.account.model.User;
-import com.bank.account.repository.UserRepository;
+import com.bank.user.exception.UserNotFoundException;
+import com.bank.user.model.Role;
+import com.bank.user.model.User;
+import com.bank.user.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -32,20 +31,21 @@ public class UserService {
         return user.get();
     }
 
-    public void registerUser(RegistrationRequest request) {
+    public User registerUser(String firstName, String lastName, String email, String phoneNumber, String password) {
         User user = User.builder()
-                .email(request.email())
-                .firstName(request.firstName())
-                .lastName(request.lastName())
-                .password("123")
-                .phoneNumber(request.phoneNumber())
+                .email(email)
+                .firstName(firstName)
+                .lastName(lastName)
+                .password(passwordEncoder.encode(password))
+                .phoneNumber(phoneNumber)
                 .role(Role.USER)
                 .build();
 
-        userRepository.save(user);
+        user = userRepository.save(user);
 
-        log.info("Новый пользователь создан {}", request.email());
+        log.info("Новый пользователь создан {}", email);
 
+        return user;
     }
 
     public void setPassword(String email, String password) {

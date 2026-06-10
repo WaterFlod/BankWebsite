@@ -22,7 +22,7 @@
         <div class="navbar">
             <a th:href="@{/home}" class="logo">Bank</a>
             <div class="nav-links">
-                <a th:href="@{/product/debit}">Карты</a>
+                <a th:href="@{/product/checking}">Карты</a>
                 <a th:href="@{/product/credit}">Кредиты</a>
                 <a th:href="@{/product/savings}">Накопления</a>
             </div>
@@ -66,7 +66,7 @@
                     </div>
                     <div class="input-group">
                         <label>Номер счета получателя</label>
-                        <input type="text" th:field="*{toAccountNumber}" placeholder="ACC123123123123" required>
+                        <input type="text" th:field="*{toAccountNumber}" placeholder="Номер счета" required>
                     </div>
 
                     <div th:if="${error}" class="alert alert-danger" th:text="${error}"></div>

@@ -1,7 +1,7 @@
-package com.bank.account.security;
+package com.bank.user.security;
 
-import com.bank.account.model.User;
-import com.bank.account.repository.UserRepository;
+import com.bank.user.model.User;
+import com.bank.user.repository.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;

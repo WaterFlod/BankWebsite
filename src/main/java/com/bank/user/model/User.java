@@ -1,5 +1,6 @@
-package com.bank.account.model;
+package com.bank.user.model;
 
+import com.bank.account.model.Account;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;

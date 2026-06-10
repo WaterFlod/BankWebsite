@@ -1,13 +1,10 @@
 package com.bank.account.controller;
 
-import com.bank.account.dto.CreateAccountRequest;
-import com.bank.account.dto.RegistrationDebitRequest;
 import com.bank.account.dto.RegistrationRequest;
-import com.bank.account.model.AccountType;
-import com.bank.account.security.CustomUserDetailsService;
-import com.bank.account.security.UserDetailsImpl;
+import com.bank.user.model.User;
+import com.bank.user.security.CustomUserDetailsService;
 import com.bank.account.service.AccountService;
-import com.bank.account.service.UserService;
+import com.bank.user.service.UserService;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +21,8 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import java.math.BigDecimal;
+
 @Controller
 @RequestMapping("/product")
 @RequiredArgsConstructor
@@ -33,40 +32,188 @@ public class ProductController {
     private final AccountService accountService;
     private final CustomUserDetailsService userDetailsService;
 
-    @GetMapping("/debit")
-    public String debitAccount(Authentication auth, Model model) {
+    @GetMapping("/checking")
+    public String checkingAccount(Authentication auth, Model model) {
         if (auth != null) {
             model.addAttribute("username", auth.getName());
         }
-        model.addAttribute("request", new RegistrationDebitRequest());
-        return "debit";
+        model.addAttribute("request", new RegistrationRequest());
+        return "checking";
     }
 
-    @PostMapping("/debit")
-    public String createDebitAccount(@Valid @ModelAttribute("request") RegistrationDebitRequest request,
-                                     HttpSession session,
+    @PostMapping("/checking")
+    public String createCheckingAccount(@Valid @ModelAttribute("request") RegistrationRequest request,
+                                     HttpSession session, Authentication auth,
                                      Model model){
-        if (userService.existsUserByEmail(request.getEmail())) {
-            model.addAttribute("error", "Пользователь с таким email уже существует");
-            return "debit";
+
+        String email;
+        BigDecimal initialBalance;
+        User user;
+
+        if (auth == null) {
+            boolean flag = false;
+
+            if (userService.existsUserByEmail(request.getEmail())) {
+                model.addAttribute("error", "Пользователь с таким email уже существует");
+                flag = true;
+            }
+            if (userService.existsUserByPhoneNumber(request.getPhoneNumber())) {
+                model.addAttribute("error", "Пользователь с таким номером телефона уже существует");
+                flag = true;
+            }
+            if (request.getInitialDeposit().signum() == -1) {
+                model.addAttribute("error", "Первоначальный депозит не может быть отрицательным");
+                flag = true;
+            }
+            if (request.getPassword().length() < 8) {
+                model.addAttribute("error", "Пароль должен быть не менее 8 символов");
+                flag = true;
+            }
+            if (flag) {
+                return "debit";
+            }
+
+            email = request.getEmail();
+            user = userService.registerUser(request.getFirstName(), request.getLastName(),
+                    request.getEmail(), request.getPhoneNumber(), request.getPassword());
+        } else {
+            email = auth.getName();
+            user = userService.findUserByIdentifier(email);
         }
-        if (userService.existsUserByPhoneNumber(request.getPhoneNumber())) {
-            model.addAttribute("error", "Пользователь с таким номером телефона уже существует");
-            return "debit";
+
+        initialBalance = request.getInitialDeposit();
+
+        session.setAttribute("email", email);
+
+        accountService.createCheckingAccount(user, initialBalance);
+
+        if (auth == null) {
+            SecurityContext context = setContext(user.getEmail());
+            session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, context);
         }
-        if (request.getInitialDeposit().signum() == -1) {
-            model.addAttribute("error", "Первоначальный депозит не может быть отрицательным");
-            return "debit";
+        return "redirect:/account";
+    }
+
+    @GetMapping("/savings")
+    public String savingsAccount(Authentication auth, Model model) {
+        if (auth != null) {
+            model.addAttribute("username", auth.getName());
         }
-        userService.registerUser(debitRequestToRegistrationRequest(request));
+        model.addAttribute("request", new RegistrationRequest());
+        return "savings";
+    }
 
-        session.setAttribute("email", request.getEmail());
+    @PostMapping("/savings")
+    public String createSavingsAccount(@Valid @ModelAttribute("request") RegistrationRequest request,
+                                        HttpSession session, Authentication auth,
+                                        Model model){
+        String email;
+        BigDecimal initialBalance;
+        User user;
 
-        CreateAccountRequest createAccountRequest = new CreateAccountRequest(request.getEmail(), AccountType.CHECKING, request.getInitialDeposit());
+        if (auth == null) {
+            boolean flag = false;
 
-        accountService.createAccount(createAccountRequest);
+            if (userService.existsUserByEmail(request.getEmail())) {
+                model.addAttribute("error", "Пользователь с таким email уже существует");
+                flag = true;
+            }
+            if (userService.existsUserByPhoneNumber(request.getPhoneNumber())) {
+                model.addAttribute("error", "Пользователь с таким номером телефона уже существует");
+                flag = true;
+            }
+            if (request.getInitialDeposit().signum() == -1) {
+                model.addAttribute("error", "Первоначальный депозит не может быть отрицательным");
+                flag = true;
+            }
+            if (request.getPassword().length() < 8) {
+                model.addAttribute("error", "Пароль должен быть не менее 8 символов");
+                flag = true;
+            }
+            if (flag) {
+                return "savings";
+            }
 
-        UserDetails userDetails = userDetailsService.loadUserByUsername(request.getEmail());
+            email = request.getEmail();
+            user = userService.registerUser(request.getFirstName(), request.getLastName(),
+                    request.getEmail(), request.getPhoneNumber(), request.getPassword());
+        } else {
+            email = auth.getName();
+            user = userService.findUserByIdentifier(email);
+        }
+        initialBalance = request.getInitialDeposit();
+
+        session.setAttribute("email", email);
+
+        accountService.createSavingsAccount(user, initialBalance);
+
+        if (auth == null) {
+            SecurityContext context = setContext(user.getEmail());
+            session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, context);
+        }
+
+        return "redirect:/account";
+    }
+
+    @GetMapping("/credit")
+    public String creditAccount(Authentication auth, Model model) {
+        if (auth != null) {
+            model.addAttribute("username", auth.getName());
+        }
+        model.addAttribute("request", new RegistrationRequest());
+        return "credit";
+    }
+
+    @PostMapping("/credit")
+    public String createCreditAccount(@Valid @ModelAttribute("request") RegistrationRequest request,
+                                       HttpSession session, Authentication auth,
+                                       Model model){
+        String email;
+        User user;
+
+        if (auth == null) {
+            boolean flag = false;
+
+            if (userService.existsUserByEmail(request.getEmail())) {
+                model.addAttribute("error", "Пользователь с таким email уже существует");
+                flag = true;
+            }
+            if (userService.existsUserByPhoneNumber(request.getPhoneNumber())) {
+                model.addAttribute("error", "Пользователь с таким номером телефона уже существует");
+                flag = true;
+            }
+            if (request.getInitialDeposit().signum() == -1) {
+                model.addAttribute("error", "Первоначальный депозит не может быть отрицательным");
+                flag = true;
+            }
+            if (request.getPassword().length() < 8) {
+                model.addAttribute("error", "Пароль должен быть не менее 8 символов");
+                flag = true;
+            }
+            if (flag) {
+                return "savings";
+            }
+
+            email = request.getEmail();
+            user = userService.registerUser(request.getFirstName(), request.getLastName(),
+                    request.getEmail(), request.getPhoneNumber(), request.getPassword());
+        } else {
+            email = auth.getName();
+            user = userService.findUserByIdentifier(email);
+        }
+
+        session.setAttribute("email", email);
+
+        accountService.createCreditAccount(user, new BigDecimal("500000"));
+
+        SecurityContext context = setContext(user.getEmail());
+        session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, context);
+
+        return "redirect:/account";
+    }
+
+    private SecurityContext setContext(String email) {
+        UserDetails userDetails = userDetailsService.loadUserByUsername(email);
 
         UsernamePasswordAuthenticationToken authentication =
                 new UsernamePasswordAuthenticationToken(userDetails, userDetails.getPassword(), userDetails.getAuthorities());
@@ -75,27 +222,6 @@ public class ProductController {
         context.setAuthentication(authentication);
         SecurityContextHolder.setContext(context);
 
-        session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, context);
-
-        return "redirect:/auth/set-password";
-    }
-
-    @GetMapping("/credit")
-    public String creditAccount(Model model) {
-        return "credit";
-    }
-
-    @GetMapping("/savings")
-    public String savingsAccount(Model model) {
-        return "savings";
-    }
-
-    private RegistrationRequest debitRequestToRegistrationRequest(RegistrationDebitRequest debRequest) {
-        return new RegistrationRequest(
-                debRequest.getEmail(),
-                debRequest.getPhoneNumber(),
-                debRequest.getFirstName(),
-                debRequest.getLastName()
-        );
+        return context;
     }
 }

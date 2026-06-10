@@ -1,6 +1,5 @@
 package com.bank.account.repository;
 
-import com.bank.account.model.Account;
 import com.bank.account.model.Transaction;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

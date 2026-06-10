@@ -1,5 +1,6 @@
-package com.bank.account.exception;
+package com.bank.user.exception;
 
+import com.bank.account.exception.BaseException;
 import org.springframework.http.HttpStatus;
 
 public class UserNotFoundException extends BaseException {

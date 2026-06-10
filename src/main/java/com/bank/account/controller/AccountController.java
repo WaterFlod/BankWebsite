@@ -3,16 +3,17 @@ package com.bank.account.controller;
 import com.bank.account.dto.*;
 import com.bank.account.exception.AccountNotFoundException;
 import com.bank.account.exception.InsufficientFundsException;
-import com.bank.account.model.AccountType;
-import com.bank.account.security.SecurityUtils;
+import com.bank.account.model.Account;
+import com.bank.account.model.Transaction;
+import com.bank.user.model.User;
+import com.bank.user.security.SecurityUtils;
 import com.bank.account.service.AccountService;
-import com.bank.account.service.TransactionService;
+import com.bank.user.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,18 +26,19 @@ import java.util.List;
 public class AccountController {
 
     private final AccountService accountService;
-    private final TransactionService transactionService;
     private final SecurityUtils secUtils;
+
+    private final UserService userService;
 
     @GetMapping
     public String getAccounts(Authentication auth, Model model) {
         String userId = secUtils.getCurrentUserId();
 
-        List<AccountResponse> accounts = accountService.getAllAccounts(userId);
-        List<TransactionResponse> top10Transactions = transactionService.getLastTransaction(userId);
+        List<Account> accounts = accountService.getAllAccounts(userId);
+        List<Transaction> top10Transactions = accountService.getLastTransaction(userId);
 
         BigDecimal amount = accounts.stream()
-                .map(AccountResponse::balance)
+                .map(Account::getBalance)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         model.addAttribute("accounts", accounts);
@@ -58,15 +60,16 @@ public class AccountController {
     public String createAccount(@Valid @ModelAttribute("request") OpenAccount request,
                                 Authentication auth) {
 
-        BigDecimal amount = request.getAmount();
+        BigDecimal amount = BigDecimal.ZERO;
+        User user = userService.findUserByIdentifier(auth.getName());
 
-        CreateAccountRequest createRequest = new CreateAccountRequest(
-                auth.getName(),
-                AccountType.CHECKING,
-                amount
-        );
-
-        accountService.createAccount(createRequest);
+        if (request.getType().equals("Checking")) {
+            accountService.createCheckingAccount(user, amount);
+        } else if (request.getType().equals("Savings")) {
+            accountService.createSavingsAccount(user, amount);
+        } else if (request.getType().equals("Credit")) {
+            accountService.createCreditAccount(user, new BigDecimal("500000"));
+        }
 
         return "redirect:/account";
     }
@@ -84,7 +87,7 @@ public class AccountController {
     @PostMapping("/{accountNumber}/deposit")
     public String deposit(@PathVariable("accountNumber") String accountNumber,
                           @Valid @ModelAttribute("request") TransactionRequest request) {
-        accountService.deposit(accountNumber, request);
+        accountService.deposit(accountNumber, request.getAmount());
         return "redirect:/account";
     }
 
@@ -116,7 +119,7 @@ public class AccountController {
         request.setFromAccountNumber(accountNumber);
 
         try {
-            accountService.transfer(request);
+            accountService.transfer(accountNumber, request.getToAccountNumber(), request.getAmount());
             return "redirect:/account";
         } catch (AccountNotFoundException e) {
             model.addAttribute("username", auth.getName());
@@ -136,7 +139,7 @@ public class AccountController {
                                          Authentication auth, Model model) {
         model.addAttribute("username", auth.getName());
 
-        List<TransactionResponse> transactions = transactionService.getAccountTransaction(accountNumber);
+        List<Transaction> transactions = accountService.getAccountTransaction(accountNumber);
 
         model.addAttribute("transactions", transactions);
 

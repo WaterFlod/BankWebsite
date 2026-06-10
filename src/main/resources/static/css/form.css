@@ -143,6 +143,44 @@
     background: linear-gradient(115deg, #E5C45E, #CF9F2E);
 }
 
+.input-group select {
+  width: 100%;
+  background: rgba(20, 20, 24, 0.8);
+  border: 1px solid rgba(212, 175, 55, 0.35);
+  border-radius: 28px;
+  padding: 14px 48px 14px 20px;
+  font-size: 1rem;
+  color: #fffff0;
+  font-family: 'Inter', sans-serif;
+  transition: all 0.25s;
+  outline: none;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23D4AF37' d='M6 8L0 0h12z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 20px center;
+  background-size: 12px 8px;
+}
+
+.input-group select:focus {
+  border-color: #D4AF37;
+  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.2);
+  background-color: rgba(25, 25, 30, 0.9);
+}
+
+.input-group select option {
+  background: #141418;
+  color: #fffff0;
+  font-family: 'Inter', sans-serif;
+  padding: 8px;
+}
+
+.input-group select:hover {
+  border-color: rgba(212, 175, 55, 0.6);
+}
+
 @media(max-width: 768px) {
     .container {
         padding: 0 24px;

@@ -1,4 +1,4 @@
-package com.bank.account.security;
+package com.bank.user.security;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;

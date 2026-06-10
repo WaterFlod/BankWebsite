@@ -8,5 +8,5 @@ import java.math.BigDecimal;
 @Data
 @NoArgsConstructor
 public class OpenAccount {
-    private BigDecimal amount;
+    private String type;
 }

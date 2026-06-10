@@ -1,7 +1,7 @@
-package com.bank.account.controller;
+package com.bank.user.controller;
 
-import com.bank.account.dto.SetPassword;
-import com.bank.account.service.UserService;
+import com.bank.user.dto.SetPassword;
+import com.bank.user.service.UserService;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

@@ -22,7 +22,7 @@
         <div class="navbar">
             <a th:href="@{/home}" class="logo">Bank</a>
             <div class="nav-links">
-                <a th:href="@{/product/debit}">Карты</a>
+                <a th:href="@{/product/checking}">Карты</a>
                 <a th:href="@{/product/credit}">Кредиты</a>
                 <a th:href="@{/product/savings}">Накопления</a>
             </div>
@@ -44,8 +44,8 @@
 <main>
     <div class="container">
         <div class="card-hero">
-            <h1>Виртуальная дебетовая карта</h1>
-            <p>Ежедневные преимущества, кэшбэк и свобода тратить без ограничений</p>
+            <h1>Кредитный счет</h1>
+            <p>Ежедневные преимущества, поддержка и свобода тратить без ограничений</p>
         </div>
 
         <div class="card-showcase">
@@ -57,15 +57,15 @@
                         <span>VALID THRU 12/28</span>
                         <span>WATER FLOD</span>
                     </div>
-                    <div class="card-badge"><i class="fas fa-credit-card"></i> DEBIT</div>
+                    <div class="card-badge"><i class="fas fa-credit-card"></i> CREDIT</div>
                 </div>
             </div>
             <div class="card-features-list">
-                <h3>Преимущества нашей карты</h3>
+                <h3>Преимущества нашего кредитного счета</h3>
                 <div class="feature-grid">
                     <div class="feature-item">
                         <i class="fas fa-percent"></i>
-                        <div class="feature-text"><h4>До 10% кэшбэк</h4><p>В категориях на выбор</p></div>
+                        <div class="feature-text"><h4>20%</h4><p>годовых</p></div>
                     </div>
                     <div class="feature-item">
                         <i class="fas fa-globe"></i>
@@ -82,18 +82,18 @@
         <div class="benefits-section">
             <h2 class="section-title">Премиальные возможности</h2>
             <div class="benefits-grid">
-                <div class="benefit-card"><i class="fas fa-concierge-bell"></i><h4>Поддержка 24/7</h4><p>Личный помощник в любой точке мира</p></div>
-                <div class="benefit-card"><i class="fas fa-plane"></i><h4>Приоритетный пассажир</h4><p>Доступ в бизнес-залы аэропортов</p></div>
-                <div class="benefit-card"><i class="fas fa-shield-alt"></i><h4>Страхование путешествий</h4><p>Покрытие до 200 000$</p></div>
-                <div class="benefit-card"><i class="fas fa-mobile-alt"></i><h4>Эксклюзивное приложение</h4><p>Управление капиталом в одно касание</p></div>
+                <div class="benefit-card"><i class="fas fa-gem"></i><h4>Хватит на все</h4><p>Лимит до 500 000 ₽</p></div>
+                <div class="benefit-card"><i class="fas fa-clock"></i><h4>Эксклюзивное предложение</h4><p>Индивидуальная ставка 20% годовых</p></div>
+                <div class="benefit-card"><i class="fas fa-comment"></i><h4>Поддержка 24/7</h4><p>Персональный финансовый помощник</p></div>
+                <div class="benefit-card"><i class="fas fa-rub"></i><h4>Удобство во всем</h4><p>Снятие без комиссии</p></div>
             </div>
         </div>
 
         <div class="order-section" sec:authorize="isAnonymous()">
-            <h2 class="form-title">Оформить виртуальную дебетовую карту</h2>
+            <h2 class="form-title">Оформить кредитный счет</h2>
 
             <!-- Форма для анонима -->
-            <form class="order-form" th:object="${request}" method="post" th:action="@{/product/debit}">
+            <form class="order-form" th:object="${request}" method="post" th:action="@{/product/credit}">
 
                 <div th:if="${error}" th:text="${error}" class="error"></div>
 
@@ -116,8 +116,8 @@
                     <input type="tel" th:field="*{phoneNumber}" placeholder="+7 (___) ___-__-__" required>
                 </div>
                 <div class="input-group">
-                    <label>Первоначальный депозит</label>
-                    <input type="text" th:field="*{initialDeposit}" placeholder="10000" required>
+                    <label>Пароль</label>
+                    <input type="password" th:field="*{password}" placeholder="password" required>
                 </div>
                 <div class="checkbox-group">
                     <input type="checkbox" required>
