@@ -1,112 +1,150 @@
-# The bank's website
+# Банковский сервис — учебный pet-проект
 
-Сайт банка с использованием современного Java-стека.<br>
-Проект разрабатываю для изучения банковского домена изнутри.
+[![Java](https://img.shields.io/badge/Java-25-blue.svg)](https://adoptium.net/)
+[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.4.5-brightgreen.svg)](https://spring.io/projects/spring-boot)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-17-blue.svg)](https://www.postgresql.org/)
+[![Docker](https://img.shields.io/badge/Docker-✓-2496ED.svg)](https://www.docker.com/)
 
-## Технологический стек
+Веб-приложение для управления банковскими счетами.  
+Проект создан с целью практики в разработке на **Java (Spring Boot)** и не имеет реальной финансовой ценности.  
+Поддерживаются три типа счетов: **расчётный**, **кредитный** и **накопительный**.
 
-| Компонент           | Технология                        | Назначение                         |
-|---------------------|-----------------------------------|------------------------------------|
-| **Backend**         | Java 25, Spring Boot 4.x          | Основной фреймворк                 |
-| **Frontend**        | HTML5, CSS, JavaScript, Thymeleaf | Отображение динамичных веб-страниц |
-| **База данных**     | PostgreSQL 15, Spring Data JPA    | Хранение данных                    |
-| **Безопасность**    | Spring Security 6                 | Аутентификация пользователя        |
-| **Утилиты**         | Lombok                            | Уменьшение boilerplate кода        |
-| **Контейнеризация** | Docker, Docker Compose            | Развертывание инфраструктуры       |
+> 🖥 **Демо-версия доступна по адресу:**  
+> **[water-flod.ru](https://water-flod.ru/home)**  
 
-##  Требования
-
-- **Java 25** или выше
-- **Maven 3.9+**
-- **Docker** и **Docker Compose**
-- **Git**
-
-## База данных
-
-### Схема данных
-
-```sql
--- Основные таблицы
-user          -- Информация о пользователях
-├── id (PK)
-├── email (UNIQUE)
-├── phone_number (UNIQUE)
-├── password 
-├── firstName
-├── lastName
-├── role (ENUM)
-└── created_at
-
-accounts          -- Информация о счетах
-├── id (PK)
-├── user_id (FK) 
-├── account_number (UNIQUE)
-├── balance
-├── type (ENUM)
-└── created_at
-
-transactions      -- История транзакций
-├── id (PK)
-├── account_id (FK)
-├── amount
-├── type (ENUM)
-├── description
-├── balance_after
-└── timestamp
-```
-
-## Карта web-сайта
-
-### Публичные страницы
-
-| Метод  | Endpoint | Описание                         |
-|--------|----------|----------------------------------|
-| `GET`  | `/`      | Редирект на '/home'              |
-| `GET`  | `/home`  | Главная страница                 |
-| `GET`  | `/debit` | Страница расчетного счета        |
-| `GET`  | `/login` | Страница авторизации             |
-
-### Страницы для авторизированных пользователей
-
-| Метод  | Endpoint                               | Описание                         |
-|--------|----------------------------------------|----------------------------------|
-| `GET`  | `/set-password`                        | Форма установки пароля           |
-| `GET`  | `/account`                             | Возвращает страницу счетов       |
-| `GET`  | `/account/open-account`                | Форма открытия нового счета      |
-| `GET`  | `/account/{accountNumber}/deposit`     | Форма депозита                   |
-| `GET`  | `/account/{accountNumber}/transfer`    | Форма перевода                   |
-| `GET`  | `/account/{accountNumber}/transaction` | История транзакций               |
-
-##  Структура проекта
-
-```
-src/main/java/com/bank/account/
-├── BankAccountServiceApplication.java  # Главный файл
-├── controller/                         # Контроллеры
-├── service/                            # Бизнес-логика
-├── repository/                         # Доступ к данным
-├── model/                              # Сущности JPA
-├── dto/                                # Data Transfer Objects
-└── security/                           # Безопасность
-
-src/main/resources/
-├── static/ 
-│   ├── css/                            # Стили шаблонов
-│   ├── js/                             # Анимация canvas
-├── templates/                          # Шаблоны thymeleaf
-├── application.yml                     # Основная конфигурация
-```
-
-##  Контакты
-
-Матвей Андреевич - [@waterflod](https://t.me/waterflod) - mse25019@gmail.com
-
-Ссылка на проект: [https://github.com/WaterFlod/BankWebsite](https://github.com/WaterFlod/BankWebsite)
 
 ---
 
-<div align="center">
+## 📋 Функциональные возможности
 
-### ⭐ Если проект вам понравился, поставьте звезду на GitHub!
+### Пользователи
+- Регистрация / авторизация (email или номер телефона).
+- Аутентификация через Spring Security (BCrypt).
+- Роли: `USER` (по умолчанию), `ADMIN` (зарезервирована).
 
-</div>
+### Управление счетами
+| Тип счета | Особенности |
+|-----------|-------------|
+| **Расчётный (Checking)** | Базовый счёт для депозитов, снятий и переводов. |
+| **Накопительный (Savings)** | Ежедневное начисление процентов (5% годовых) – выполняется в 3:00 по cron. |
+| **Кредитный (Credit)** | Кредитный лимит (фиксированный 500 000), ежедневное начисление процентов на сумму долга (20% годовых). |
+
+### Операции
+- ✅ Пополнение счёта (`/account/{number}/deposit`)
+- ✅ Снятие средств (`/account/{number}/withdraw` – присутствует в сервисе, но можно добавить форму)
+- ✅ Перевод между счетами (проверка достаточности средств/лимита)
+- ✅ Просмотр последних 10 транзакций по всем счетам пользователя
+- ✅ История транзакций конкретного счёта
+
+### Плановые задачи
+- **Начисление процентов** по накопительным и кредитным счетам (ежедневно в 3:00).
+- Используется `@Scheduled` + JPA `@Version` для оптимистичной блокировки.
+
+---
+
+## 🛠 Технологический стек
+
+| Компонент | Технология |
+|-----------|-------------|
+| Язык | Java 25 |
+| Фреймворк | Spring Boot 3.4.x |
+| Безопасность | Spring Security |
+| База данных | PostgreSQL 17 (основная), H2 (тесты) |
+| ORM | Spring Data JPA (Hibernate) |
+| Шаблонизатор | Thymeleaf + Spring Security Extras |
+| Сборка | Maven |
+| Контейнеризация | Docker + Docker Compose |
+| Логирование | SLF4J + Logback |
+| Утилиты | Lombok, Jakarta Validation |
+
+---
+
+## 🚀 Запуск проекта
+
+### Предварительные требования
+- Docker & Docker Compose
+- (Опционально) Java 25 + Maven для локального запуска без Docker
+
+### Вариант 1: Запуск через Docker Compose (рекомендуется)
+```bash
+# Клонируйте репозиторий
+git clone https://github.com/your-username/bank-account-service.git
+cd bank-account-service
+
+# Создайте файл .env (пример)
+echo "POSTGRES_DB=bankdb
+POSTGRES_USER=bankuser
+POSTGRES_PASSWORD=password123" > .env
+
+# Запустите контейнеры
+docker-compose up -d
+```
+
+Приложение станет доступно по адресу: `http://localhost:8080`
+
+### Вариант 2: Локальный запуск (без Docker)
+```bash
+# Убедитесь, что PostgreSQL запущен и создана БД
+# Настройте подключение в src/main/resources/application-prod.yml
+
+mvn clean package
+java -jar target/app.jar
+```
+
+### Доступ после запуска
+- **Главная страница:** `http://localhost:8080/home`
+- **Страница входа:** `http://localhost:8080/auth/login`
+- **Личный кабинет:** после логина → `/account`
+
+> 💡 Для тестирования можно зарегистрировать нового пользователя (пароль не менее 8 символов).
+
+---
+
+## 🧪 Структура проекта (кратко)
+```
+src/
+├── main/
+│   ├── java/com/bank/
+│   │   ├── account/          # счета, транзакции, сервисы, контроллеры
+│   │   ├── user/             # пользователи, регистрация, security
+│   │   └── configuration/    # настройки (Security, Scheduling)
+│   └── resources/
+│       ├── templates/        # Thymeleaf шаблоны
+│       └── application.yml   # конфигурация (активные профили и т.д.)
+├── docker-compose.yml
+├── Dockerfile
+└── pom.xml
+```
+
+---
+
+## 🐛 Известные ограничения (идеи для улучшения)
+- Отсутствует полноценный REST API (только MVC).
+- Нет миграций БД (Flyway/Liquibase).
+- Кредитный лимит жёстко задан (500 000).
+- Нет пагинации для истории транзакций.
+- Тесты не написаны (только базовая структура).
+
+Планируется доработать в следующих версиях.
+
+---
+
+## 🤝 Как помочь проекту (если хотите)
+Вы можете:
+- Создать **Issue** с предложением улучшения или найденной ошибкой.
+- Отправить **Pull Request** с исправлением или новой функцией.
+
+---
+
+## 📄 Лицензия
+Проект является учебным и распространяется без лицензионных ограничений (MIT или аналогичная).
+
+---
+
+## 📬 Контакты
+Автор: *Матвей*  
+GitHub: [@WaterFlod](https://github.com/WaterFlod)
+
+---
+
+_Последнее обновление: июнь 2026_
