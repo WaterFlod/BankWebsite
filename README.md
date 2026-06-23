@@ -1,116 +1,115 @@
-# Банковский сервис — учебный pet-проект
+# Banking Service — educational pet project
 
 [![Java](https://img.shields.io/badge/Java-25-blue.svg)](https://adoptium.net/)
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.4.5-brightgreen.svg)](https://spring.io/projects/spring-boot)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-17-blue.svg)](https://www.postgresql.org/)
 [![Docker](https://img.shields.io/badge/Docker-✓-2496ED.svg)](https://www.docker.com/)
 
-Веб-приложение для управления банковскими счетами.  
-Проект создан с целью практики в разработке на **Java (Spring Boot)** и не имеет реальной финансовой ценности.  
-Поддерживаются три типа счетов: **расчётный**, **кредитный** и **накопительный**.
+A web application for managing bank accounts.  
+The project was created for **Java (Spring Boot)** development practice and has no real financial value.  
+Three types of accounts are supported: **checking**, **credit**, and **savings**.
 
-> 🖥 **Демо-версия доступна по адресу:**  
+> 🖥 **A demo version is available at:**  
 > **[water-flod.ru](https://water-flod.ru/home)**  
 
+---
+
+## 📋 Features
+
+### Users
+- Registration / login (email or phone number).
+- Authentication via Spring Security (BCrypt).
+- Roles: `USER` (default), `ADMIN` (reserved).
+
+### Account Management
+| Account Type | Details |
+|--------------|---------|
+| **Checking** | Basic account for deposits, withdrawals, and transfers. |
+| **Savings**  | Daily interest accrual (5% per annum) – executed at 3:00 AM via cron. |
+| **Credit**   | Credit limit (fixed 500,000), daily interest accrual on the outstanding balance (20% per annum). |
+
+### Operations
+- ✅ Deposit to an account (`/account/{number}/deposit`)
+- ✅ Withdrawal from an account (`/account/{number}/withdraw` – present in the service; a form can be added)
+- ✅ Transfer between accounts (sufficient funds/limit check)
+- ✅ View the last 10 transactions across all user accounts
+- ✅ Transaction history for a specific account
+
+### Scheduled Tasks
+- **Interest accrual** for savings and credit accounts (daily at 3:00 AM).
+- Uses `@Scheduled` + JPA `@Version` for optimistic locking.
 
 ---
 
-## 📋 Функциональные возможности
+## 🛠 Technology Stack
 
-### Пользователи
-- Регистрация / авторизация (email или номер телефона).
-- Аутентификация через Spring Security (BCrypt).
-- Роли: `USER` (по умолчанию), `ADMIN` (зарезервирована).
-
-### Управление счетами
-| Тип счета | Особенности |
-|-----------|-------------|
-| **Расчётный (Checking)** | Базовый счёт для депозитов, снятий и переводов. |
-| **Накопительный (Savings)** | Ежедневное начисление процентов (5% годовых) – выполняется в 3:00 по cron. |
-| **Кредитный (Credit)** | Кредитный лимит (фиксированный 500 000), ежедневное начисление процентов на сумму долга (20% годовых). |
-
-### Операции
-- ✅ Пополнение счёта (`/account/{number}/deposit`)
-- ✅ Снятие средств (`/account/{number}/withdraw` – присутствует в сервисе, но можно добавить форму)
-- ✅ Перевод между счетами (проверка достаточности средств/лимита)
-- ✅ Просмотр последних 10 транзакций по всем счетам пользователя
-- ✅ История транзакций конкретного счёта
-
-### Плановые задачи
-- **Начисление процентов** по накопительным и кредитным счетам (ежедневно в 3:00).
-- Используется `@Scheduled` + JPA `@Version` для оптимистичной блокировки.
+| Component       | Technology |
+|-----------------|------------|
+| Language        | Java 25 |
+| Framework       | Spring Boot 3.4.x |
+| Security        | Spring Security |
+| Database        | PostgreSQL 17 (primary), H2 (tests) |
+| ORM             | Spring Data JPA (Hibernate) |
+| Template engine | Thymeleaf + Spring Security Extras |
+| Build tool      | Maven |
+| Containerization| Docker + Docker Compose |
+| Logging         | SLF4J + Logback |
+| Utilities       | Lombok, Jakarta Validation |
 
 ---
 
-## 🛠 Технологический стек
+## 🚀 Running the Project
 
-| Компонент | Технология |
-|-----------|-------------|
-| Язык | Java 25 |
-| Фреймворк | Spring Boot 3.4.x |
-| Безопасность | Spring Security |
-| База данных | PostgreSQL 17 (основная), H2 (тесты) |
-| ORM | Spring Data JPA (Hibernate) |
-| Шаблонизатор | Thymeleaf + Spring Security Extras |
-| Сборка | Maven |
-| Контейнеризация | Docker + Docker Compose |
-| Логирование | SLF4J + Logback |
-| Утилиты | Lombok, Jakarta Validation |
-
----
-
-## 🚀 Запуск проекта
-
-### Предварительные требования
+### Prerequisites
 - Docker & Docker Compose
-- (Опционально) Java 25 + Maven для локального запуска без Docker
+- (Optional) Java 25 + Maven for local run without Docker
 
-### Вариант 1: Запуск через Docker Compose (рекомендуется)
+### Option 1: Run with Docker Compose (recommended)
 ```bash
-# Клонируйте репозиторий
+# Clone the repository
 git clone https://github.com/your-username/bank-account-service.git
 cd bank-account-service
 
-# Создайте файл .env (пример)
+# Create an .env file (example)
 echo "POSTGRES_DB=bankdb
 POSTGRES_USER=bankuser
 POSTGRES_PASSWORD=password123" > .env
 
-# Запустите контейнеры
+# Start the containers
 docker-compose up -d
 ```
 
-Приложение станет доступно по адресу: `http://localhost:8080`
+The application will be available at: `http://localhost:8080`
 
-### Вариант 2: Локальный запуск (без Docker)
+### Option 2: Local run (without Docker)
 ```bash
-# Убедитесь, что PostgreSQL запущен и создана БД
-# Настройте подключение в src/main/resources/application-prod.yml
+# Make sure PostgreSQL is running and the database exists
+# Configure the connection in src/main/resources/application-prod.yml
 
 mvn clean package
 java -jar target/app.jar
 ```
 
-### Доступ после запуска
-- **Главная страница:** `http://localhost:8080/home`
-- **Страница входа:** `http://localhost:8080/auth/login`
-- **Личный кабинет:** после логина → `/account`
+### Access after launch
+- **Home page:** `http://localhost:8080/home`
+- **Login page:** `http://localhost:8080/auth/login`
+- **Dashboard:** after login → `/account`
 
-> 💡 Для тестирования можно зарегистрировать нового пользователя (пароль не менее 8 символов).
+> 💡 For testing, you can register a new user (password must be at least 8 characters).
 
 ---
 
-## 🧪 Структура проекта (кратко)
+## 🧪 Project Structure (overview)
 ```
 src/
 ├── main/
 │   ├── java/com/bank/
-│   │   ├── account/          # счета, транзакции, сервисы, контроллеры
-│   │   ├── user/             # пользователи, регистрация, security
-│   │   └── configuration/    # настройки (Security, Scheduling)
+│   │   ├── account/          # accounts, transactions, services, controllers
+│   │   ├── user/             # users, registration, security
+│   │   └── configuration/    # settings (Security, Scheduling)
 │   └── resources/
-│       ├── templates/        # Thymeleaf шаблоны
-│       └── application.yml   # конфигурация (активные профили и т.д.)
+│       ├── templates/        # Thymeleaf templates
+│       └── application.yml   # configuration (active profiles, etc.)
 ├── docker-compose.yml
 ├── Dockerfile
 └── pom.xml
@@ -118,33 +117,33 @@ src/
 
 ---
 
-## 🐛 Известные ограничения (идеи для улучшения)
-- Отсутствует полноценный REST API (только MVC).
-- Нет миграций БД (Flyway/Liquibase).
-- Кредитный лимит жёстко задан (500 000).
-- Нет пагинации для истории транзакций.
-- Тесты не написаны (только базовая структура).
+## 🐛 Known Limitations (ideas for improvement)
+- No full-fledged REST API (MVC only).
+- No database migrations (Flyway/Liquibase).
+- Credit limit is hardcoded (500,000).
+- No pagination for transaction history.
+- Tests are not written (only basic structure).
 
-Планируется доработать в следующих версиях.
-
----
-
-## 🤝 Как помочь проекту (если хотите)
-Вы можете:
-- Создать **Issue** с предложением улучшения или найденной ошибкой.
-- Отправить **Pull Request** с исправлением или новой функцией.
+Planned for future versions.
 
 ---
 
-## 📄 Лицензия
-Проект является учебным и распространяется без лицензионных ограничений (MIT или аналогичная).
+## 🤝 How to Contribute (if you want)
+You can:
+- Create an **Issue** with a suggestion for improvement or a bug report.
+- Submit a **Pull Request** with a fix or a new feature.
 
 ---
 
-## 📬 Контакты
-Автор: *Матвей*  
-GitHub: [@WaterFlod](https://github.com/WaterFlod)
+## 📄 License
+This project is educational and is distributed without licensing restrictions (MIT or similar).
 
 ---
 
-_Последнее обновление: июнь 2026_
+## 📬 Contacts
+Author: *Matthew*  
+Questions or ideas? Reach out via [Telegram](https://t.me/waterflod) or open an issue.
+
+---
+
+_Last updated: June 2026_
