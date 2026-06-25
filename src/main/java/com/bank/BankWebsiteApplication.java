@@ -6,8 +6,8 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
 @EnableScheduling
-public class BankAccountServiceApplication {
+public class BankWebsiteApplication {
     public static void main(String[] args) {
-        SpringApplication.run(BankAccountServiceApplication.class, args);
+        SpringApplication.run(BankWebsiteApplication.class, args);
     }
 }
