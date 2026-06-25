@@ -16,12 +16,16 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.ui.ModelMap;
+import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/product")
@@ -44,32 +48,20 @@ public class ProductController {
     @PostMapping("/checking")
     public String createCheckingAccount(@Valid @ModelAttribute("request") RegistrationRequest request,
                                      HttpSession session, Authentication auth,
-                                     Model model){
+                                     Model model,
+                                        Errors errors,
+                                        ModelMap modelMap){
 
         String email;
         BigDecimal initialBalance;
         User user;
 
         if (auth == null) {
-            boolean flag = false;
+            Map<String, String> fieldErrors = validateFields(request.getEmail(), request.getPhoneNumber(),
+                    request.getInitialDeposit(), request.getPassword());
 
-            if (userService.existsUserByEmail(request.getEmail())) {
-                model.addAttribute("error", "Пользователь с таким email уже существует");
-                flag = true;
-            }
-            if (userService.existsUserByPhoneNumber(request.getPhoneNumber())) {
-                model.addAttribute("error", "Пользователь с таким номером телефона уже существует");
-                flag = true;
-            }
-            if (request.getInitialDeposit().signum() == -1) {
-                model.addAttribute("error", "Первоначальный депозит не может быть отрицательным");
-                flag = true;
-            }
-            if (request.getPassword().length() < 8) {
-                model.addAttribute("error", "Пароль должен быть не менее 8 символов");
-                flag = true;
-            }
-            if (flag) {
+            if (!fieldErrors.isEmpty()) {
+                model.addAllAttributes(fieldErrors);
                 return "debit";
             }
 
@@ -112,25 +104,11 @@ public class ProductController {
         User user;
 
         if (auth == null) {
-            boolean flag = false;
+            Map<String, String> fieldErrors = validateFields(request.getEmail(), request.getPhoneNumber(),
+                    request.getInitialDeposit(), request.getPassword());
 
-            if (userService.existsUserByEmail(request.getEmail())) {
-                model.addAttribute("error", "Пользователь с таким email уже существует");
-                flag = true;
-            }
-            if (userService.existsUserByPhoneNumber(request.getPhoneNumber())) {
-                model.addAttribute("error", "Пользователь с таким номером телефона уже существует");
-                flag = true;
-            }
-            if (request.getInitialDeposit().signum() == -1) {
-                model.addAttribute("error", "Первоначальный депозит не может быть отрицательным");
-                flag = true;
-            }
-            if (request.getPassword().length() < 8) {
-                model.addAttribute("error", "Пароль должен быть не менее 8 символов");
-                flag = true;
-            }
-            if (flag) {
+            if (!fieldErrors.isEmpty()) {
+                model.addAllAttributes(fieldErrors);
                 return "savings";
             }
 
@@ -172,26 +150,12 @@ public class ProductController {
         User user;
 
         if (auth == null) {
-            boolean flag = false;
+            Map<String, String> fieldErrors = validateFields(request.getEmail(), request.getPhoneNumber(),
+                    request.getInitialDeposit(), request.getPassword());
 
-            if (userService.existsUserByEmail(request.getEmail())) {
-                model.addAttribute("error", "Пользователь с таким email уже существует");
-                flag = true;
-            }
-            if (userService.existsUserByPhoneNumber(request.getPhoneNumber())) {
-                model.addAttribute("error", "Пользователь с таким номером телефона уже существует");
-                flag = true;
-            }
-            if (request.getInitialDeposit().signum() == -1) {
-                model.addAttribute("error", "Первоначальный депозит не может быть отрицательным");
-                flag = true;
-            }
-            if (request.getPassword().length() < 8) {
-                model.addAttribute("error", "Пароль должен быть не менее 8 символов");
-                flag = true;
-            }
-            if (flag) {
-                return "savings";
+            if (!fieldErrors.isEmpty()) {
+                model.addAllAttributes(fieldErrors);
+                return "credit";
             }
 
             email = request.getEmail();
@@ -210,6 +174,25 @@ public class ProductController {
         session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, context);
 
         return "redirect:/account";
+    }
+
+    private Map<String, String> validateFields(String email, String phoneNumber, BigDecimal initialDeposit, String password) {
+        var errors = new HashMap<String, String>();
+
+        if (userService.existsUserByEmail(email)) {
+            errors.put("emailError", "Пользователь с таким email уже существует");
+        }
+        if (userService.existsUserByPhoneNumber(phoneNumber)) {
+            errors.put("numberError", "Пользователь с таким номером телефона уже существует");
+        }
+        if (initialDeposit.signum() == -1) {
+            errors.put("depositError", "Первоначальный депозит не может быть отрицательным");
+        }
+        if (password.length() < 8) {
+            errors.put("passwordError", "Пароль должен быть не менее 8 символов");
+        }
+
+        return errors;
     }
 
     private SecurityContext setContext(String email) {
