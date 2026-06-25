@@ -63,8 +63,8 @@ public class AccountService {
     }
 
     @Transactional
-    public CreditAccount createCreditAccount(User user, BigDecimal creditLimit) {
-        CreditAccount account = new CreditAccount(generateAccountNumber(), creditLimit, user);
+    public CreditAccount createCreditAccount(User user, BigDecimal initialBalance, BigDecimal creditLimit) {
+        CreditAccount account = new CreditAccount(generateAccountNumber(), initialBalance, creditLimit, user);
         account = accountRepository.save(account);
         log.info("Создан кредитный счет {} с лимитом {} для пользователя {}",
                 account.getAccountNumber(), creditLimit, user.getEmail());
