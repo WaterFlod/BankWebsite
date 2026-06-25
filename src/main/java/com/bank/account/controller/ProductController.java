@@ -204,7 +204,7 @@ public class ProductController {
 
         session.setAttribute("email", email);
 
-        accountService.createCreditAccount(user, new BigDecimal("500000"));
+        accountService.createCreditAccount(user, request.getInitialDeposit(), new BigDecimal("500000"));
 
         SecurityContext context = setContext(user.getEmail());
         session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY, context);
