@@ -17,19 +17,22 @@ import java.time.LocalDate;
 @NoArgsConstructor
 public class CreditAccount extends Account {
 
+    @Column
     private BigDecimal principalDebit;
-
-    private BigDecimal accruedInterest;
-
-    private LocalDate lastInterestDate;
 
     @Column(nullable = false)
     private BigDecimal creditLimit;
 
-    public CreditAccount(String accountNumber, BigDecimal creditLimit, User user) {
-        super(accountNumber, BigDecimal.ZERO, user);
+    @Column
+    private BigDecimal accruedInterest;
+
+    @Column
+    private LocalDate lastInterestDate;
+
+    public CreditAccount(String accountNumber, BigDecimal initialBalance, BigDecimal creditLimit, User user) {
+        super(accountNumber, creditLimit.add(initialBalance), user);
         this.creditLimit = creditLimit;
-        this.principalDebit = BigDecimal.ZERO;
+        this.principalDebit = initialBalance;
         this.accruedInterest = BigDecimal.ZERO;
         this.lastInterestDate = LocalDate.now();
     }
