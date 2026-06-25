@@ -63,12 +63,17 @@ public class AccountController {
         BigDecimal amount = BigDecimal.ZERO;
         User user = userService.findUserByIdentifier(auth.getName());
 
-        if (request.getType().equals("Checking")) {
-            accountService.createCheckingAccount(user, amount);
-        } else if (request.getType().equals("Savings")) {
-            accountService.createSavingsAccount(user, amount);
-        } else if (request.getType().equals("Credit")) {
-            accountService.createCreditAccount(user, new BigDecimal("500000"));
+        switch (request.getType())
+        {
+            case "Checking":
+                accountService.createCheckingAccount(user, amount);
+                break;
+            case "Savings":
+                accountService.createSavingsAccount(user, amount);
+                break;
+            case "Credit":
+                accountService.createCreditAccount(user, amount, new BigDecimal("50000"));
+                break;
         }
 
         return "redirect:/account";
