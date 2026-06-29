@@ -47,6 +47,8 @@ public class AccountService {
 
         CheckingAccount account = new CheckingAccount(generateAccountNumber(), initialBalance, user);
 
+        /* The general logic for creating accounts has been moved
+           to a separate method to reduce the amount of code */
         account = (CheckingAccount) createAccount(account, initialBalance);
 
         log.info("Create checking account {} for the user {}", account.getAccountNumber(), user.getEmail());
@@ -62,6 +64,8 @@ public class AccountService {
 
         SavingsAccount account = new SavingsAccount(generateAccountNumber(), initialBalance, user);
 
+        /* The general logic for creating accounts has been moved
+           to a separate method to reduce the amount of code */
         account = (SavingsAccount) createAccount(account, initialBalance);
 
         log.info("Create savings account {} for the user {}", account.getAccountNumber(), user.getEmail());
@@ -77,6 +81,8 @@ public class AccountService {
 
         CreditAccount account = new CreditAccount(generateAccountNumber(), initialBalance, creditLimit, user);
 
+        /* The general logic for creating accounts has been moved
+           to a separate method to reduce the amount of code */
         account = (CreditAccount) createAccount(account, initialBalance);
 
         log.info("Create credit account {} with a limit {} for the user {}",
@@ -247,6 +253,7 @@ public class AccountService {
     private Account createAccount(Account account, BigDecimal initialBalance) {
         account = accountRepository.save(account);
 
+        // If the initial deposit is not positive, the transaction should not be created
         if (initialBalance.compareTo(BigDecimal.ZERO) > 0) {
             createTransaction(account, initialBalance, TransactionType.DEPOSIT,
                     "Initial deposit", account.getBalance());
