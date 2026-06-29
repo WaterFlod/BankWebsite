@@ -27,6 +27,7 @@ class AccountServiceTest {
 
     private static final BigDecimal POSITIVE_BALANCE = new BigDecimal("1000");
     private static final BigDecimal NEGATIVE_BALANCE = new BigDecimal("-1000");
+    private static final BigDecimal ZERO_BALANCE = BigDecimal.ZERO;
 
     private User user;
 
@@ -60,5 +61,19 @@ class AccountServiceTest {
         assertThatThrownBy(() -> accountService.createCheckingAccount(user, NEGATIVE_BALANCE))
                 .isExactlyInstanceOf(IllegalAccessError.class)
                 .hasMessage("The initial deposit must not be negative.");
+    }
+
+    @Test
+    @DisplayName("Create checking account with zero balance should save account and not create deposit transaction")
+    void createCheckingAccount_zeroBalance_shouldSaveAccountAndNotCreateTransaction() {
+        CheckingAccount savedAccount = mock(CheckingAccount.class);
+        when(accountRepository.save(any(CheckingAccount.class))).thenReturn(savedAccount);
+        when(savedAccount.getBalance()).thenReturn(ZERO_BALANCE);
+
+        CheckingAccount result = accountService.createCheckingAccount(user, ZERO_BALANCE);
+
+        assertThat(result).isEqualTo(savedAccount);
+        verify(accountRepository).save(any(CheckingAccount.class));
+        verify(accountService, never()).createTransaction(any(), any(), any(), any(), any());
     }
 }

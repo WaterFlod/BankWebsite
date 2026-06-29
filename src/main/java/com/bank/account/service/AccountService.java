@@ -105,7 +105,7 @@ public class AccountService {
     @Transactional
     public void withdraw(String accountNumber, BigDecimal amount) {
         if (amount.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new IllegalArgumentException("Сумма пополнения должна быть положительной");
+            throw new IllegalArgumentException("Сумма снятия должна быть положительной");
         }
 
         Account account = getAccount(accountNumber);
@@ -257,7 +257,7 @@ public class AccountService {
         }
     }
 
-    private void createTransaction(Account account, BigDecimal amount, TransactionType type,
+    public void createTransaction(Account account, BigDecimal amount, TransactionType type,
                                    String description, BigDecimal balanceAfter) {
         Transaction transaction = Transaction.builder()
                 .account(account)
