@@ -14,6 +14,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.math.BigDecimal;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.*;
 
@@ -25,6 +26,7 @@ class AccountServiceTest {
     @InjectMocks AccountService accountService;
 
     private static final BigDecimal POSITIVE_BALANCE = new BigDecimal("1000");
+    private static final BigDecimal NEGATIVE_BALANCE = new BigDecimal("-1000");
 
     private User user;
 
@@ -50,5 +52,13 @@ class AccountServiceTest {
                 transaction.getType() == TransactionType.DEPOSIT &&
                 transaction.getAmount().compareTo(POSITIVE_BALANCE) == 0
         ));
+    }
+
+    @Test
+    @DisplayName("Create checking account with negative balance should throw IllegalArgumentException")
+    void createCheckingAccount_negativeBalance_shouldThrowException() {
+        assertThatThrownBy(() -> accountService.createCheckingAccount(user, NEGATIVE_BALANCE))
+                .isExactlyInstanceOf(IllegalAccessError.class)
+                .hasMessage("The initial deposit must not be negative.");
     }
 }
