@@ -59,8 +59,8 @@ class AccountServiceTest {
     @DisplayName("Create checking account with negative balance should throw IllegalArgumentException")
     void createCheckingAccount_negativeBalance_shouldThrowException() {
         assertThatThrownBy(() -> accountService.createCheckingAccount(user, NEGATIVE_BALANCE))
-                .isExactlyInstanceOf(IllegalAccessError.class)
-                .hasMessage("The initial deposit must not be negative.");
+                .isExactlyInstanceOf(IllegalArgumentException.class)
+                .hasMessage("The initial deposit must not be negative");
     }
 
     @Test

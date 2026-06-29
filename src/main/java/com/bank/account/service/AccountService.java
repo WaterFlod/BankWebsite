@@ -26,6 +26,7 @@ import java.util.UUID;
 @Slf4j
 @Service
 @RequiredArgsConstructor
+// Business logic of accounts
 public class AccountService {
 
     private final AccountRepository accountRepository;
@@ -40,34 +41,47 @@ public class AccountService {
 
     @Transactional
     public CheckingAccount createCheckingAccount(User user, BigDecimal initialBalance) {
-        CheckingAccount account = new CheckingAccount(generateAccountNumber(), initialBalance, user);
-        account = accountRepository.save(account);
-
-        if (initialBalance.compareTo(BigDecimal.ZERO) > 0) {
-            createTransaction(account, initialBalance, TransactionType.DEPOSIT,
-                    "Начальный депозит", account.getBalance());
+        if (initialBalance.compareTo(BigDecimal.ZERO) < 0) {
+            throw new IllegalArgumentException("The initial deposit must not be negative");
         }
-        log.info("Создан расчетный счет {} для пользователя {}", account.getAccountNumber(), user.getEmail());
+
+        CheckingAccount account = new CheckingAccount(generateAccountNumber(), initialBalance, user);
+
+        account = (CheckingAccount) createAccount(account, initialBalance);
+
+        log.info("Create checking account {} for the user {}", account.getAccountNumber(), user.getEmail());
+
         return account;
     }
 
     @Transactional
     public SavingsAccount createSavingsAccount(User user, BigDecimal initialBalance) {
-        SavingsAccount account = new SavingsAccount(generateAccountNumber(), initialBalance, user);
-        account = accountRepository.save(account);
+        if (initialBalance.compareTo(BigDecimal.ZERO) < 0) {
+            throw new IllegalArgumentException("The initial deposit must not be negative");
+        }
 
-        createTransaction(account, initialBalance, TransactionType.DEPOSIT,
-                "Начальный депозит", account.getBalance());
-        log.info("Создан накопительный счет {} для пользователя {}", account.getAccountNumber(), user.getEmail());
+        SavingsAccount account = new SavingsAccount(generateAccountNumber(), initialBalance, user);
+
+        account = (SavingsAccount) createAccount(account, initialBalance);
+
+        log.info("Create savings account {} for the user {}", account.getAccountNumber(), user.getEmail());
+
         return account;
     }
 
     @Transactional
     public CreditAccount createCreditAccount(User user, BigDecimal initialBalance, BigDecimal creditLimit) {
+        if (initialBalance.compareTo(BigDecimal.ZERO) < 0) {
+            throw new IllegalArgumentException("The initial deposit must not be negative");
+        }
+
         CreditAccount account = new CreditAccount(generateAccountNumber(), initialBalance, creditLimit, user);
-        account = accountRepository.save(account);
-        log.info("Создан кредитный счет {} с лимитом {} для пользователя {}",
+
+        account = (CreditAccount) createAccount(account, initialBalance);
+
+        log.info("Create credit account {} with a limit {} for the user {}",
                 account.getAccountNumber(), creditLimit, user.getEmail());
+
         return account;
     }
 
@@ -228,6 +242,17 @@ public class AccountService {
 
     public List<Transaction> getAccountTransaction(String accountNumber) {
         return transactionRepository.findByAccountNumber(accountNumber);
+    }
+
+    private Account createAccount(Account account, BigDecimal initialBalance) {
+        account = accountRepository.save(account);
+
+        if (initialBalance.compareTo(BigDecimal.ZERO) > 0) {
+            createTransaction(account, initialBalance, TransactionType.DEPOSIT,
+                    "Initial deposit", account.getBalance());
+        }
+
+        return account;
     }
 
     private Account getAccount(String accountNumber) {
