@@ -6,12 +6,10 @@ import com.bank.account.repository.CreditAccountRepository;
 import com.bank.account.repository.SavingsAccountRepository;
 import com.bank.account.exception.AccountNotFoundException;
 import com.bank.account.exception.InsufficientFundsException;
-import com.bank.account.repository.TransactionRepository;
 import com.bank.user.model.User;
 import com.bank.account.repository.AccountRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,7 +30,7 @@ public class AccountService {
     private final AccountRepository accountRepository;
     private final SavingsAccountRepository savingsAccountRepository;
     private final CreditAccountRepository creditAccountRepository;
-    private final TransactionRepository transactionRepository;
+    private final TransactionService transactionService;
 
     private static final BigDecimal SAVINGS_RATE = new BigDecimal("0.05");
     private static final BigDecimal CREDIT_RATE = new BigDecimal("0.20");
@@ -116,7 +114,7 @@ public class AccountService {
         account.setBalance(newBalance);
         accountRepository.save(account);
 
-        createTransaction(account, amount, TransactionType.DEPOSIT,
+        transactionService.createTransaction(account, amount, TransactionType.DEPOSIT,
                 "Пополнение счета " + accountNumber + " на сумму " + amount, newBalance);
         log.info("Пополнение счета {} на {}: новый баланс {}", accountNumber, amount, newBalance);
 
@@ -139,7 +137,7 @@ public class AccountService {
         }
         accountRepository.save(account);
 
-        createTransaction(account, amount, TransactionType.WITHDRAWAL,
+        transactionService.createTransaction(account, amount, TransactionType.WITHDRAWAL,
                 "Снятие со счета " + account.getAccountNumber() + " на сумму " + amount, newBalance);
         log.info("Снятие со счёта {} суммы {}: новый баланс {}", accountNumber, amount, newBalance);
     }
@@ -177,9 +175,9 @@ public class AccountService {
         accountRepository.save(from);
         accountRepository.save(to);
 
-        createTransaction(from, amount, TransactionType.TRANSFER_OUT,
+        transactionService.createTransaction(from, amount, TransactionType.TRANSFER_OUT,
                 "Перевод на счет " + toAccountNumber, fromNewBalance);
-        createTransaction(to, amount, TransactionType.TRANSFER_IN,
+        transactionService.createTransaction(to, amount, TransactionType.TRANSFER_IN,
                 "Перевод со счета " + fromAccountNumber, toNewBalance);
         log.info("Перевод {} со счета {} на счет {} выполнен",
                 amount, fromAccountNumber, toAccountNumber);
@@ -206,7 +204,7 @@ public class AccountService {
                 sa.setLastInterestDate(today);
                 savingsAccountRepository.save(sa);
 
-                createTransaction(sa, interest, TransactionType.INTEREST,
+                transactionService.createTransaction(sa, interest, TransactionType.INTEREST,
                         "Начислены проценты за " + days + " дн.", newBalance);
                 log.info("Начислены проценты {} на счет {}", interest, sa.getAccountNumber());
             }
@@ -235,19 +233,11 @@ public class AccountService {
                 ca.setLastInterestDate(today);
                 creditAccountRepository.save(ca);
 
-                createTransaction(ca, interest, TransactionType.INTEREST,
+                transactionService.createTransaction(ca, interest, TransactionType.INTEREST,
                         "Начислены проценты по кредиту за " + days + " дн.", newBalance);
                 log.info("Начислены проценты по кредиту {} на сумму {}", ca.getAccountNumber(), interest);
             }
         }
-    }
-
-    public List<Transaction> getLastTransaction(String userId) {
-        return transactionRepository.findTop10ByUserId(userId, Pageable.ofSize(10));
-    }
-
-    public List<Transaction> getAccountTransaction(String accountNumber) {
-        return transactionRepository.findByAccountNumber(accountNumber);
     }
 
     private Account createAccount(Account account, BigDecimal initialBalance) {
@@ -255,7 +245,7 @@ public class AccountService {
 
         // If the initial deposit is not positive, the transaction should not be created
         if (initialBalance.compareTo(BigDecimal.ZERO) > 0) {
-            createTransaction(account, initialBalance, TransactionType.DEPOSIT,
+            transactionService.createTransaction(account, initialBalance, TransactionType.DEPOSIT,
                     "Initial deposit", account.getBalance());
         }
 
@@ -287,17 +277,5 @@ public class AccountService {
                 throw new InsufficientFundsException("Недостаточно средств на счете");
             }
         }
-    }
-
-    public void createTransaction(Account account, BigDecimal amount, TransactionType type,
-                                   String description, BigDecimal balanceAfter) {
-        Transaction transaction = Transaction.builder()
-                .account(account)
-                .amount(amount)
-                .type(type)
-                .description(description)
-                .balanceAfter(balanceAfter)
-                .build();
-        transactionRepository.save(transaction);
     }
 }

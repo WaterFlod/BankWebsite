@@ -5,6 +5,7 @@ import com.bank.account.exception.AccountNotFoundException;
 import com.bank.account.exception.InsufficientFundsException;
 import com.bank.account.model.Account;
 import com.bank.account.model.Transaction;
+import com.bank.account.service.TransactionService;
 import com.bank.user.model.User;
 import com.bank.user.security.SecurityUtils;
 import com.bank.account.service.AccountService;
@@ -26,6 +27,7 @@ import java.util.List;
 public class AccountController {
 
     private final AccountService accountService;
+    private final TransactionService transactionService;
     private final SecurityUtils secUtils;
 
     private final UserService userService;
@@ -35,7 +37,7 @@ public class AccountController {
         String userId = secUtils.getCurrentUserId();
 
         List<Account> accounts = accountService.getAllAccounts(userId);
-        List<Transaction> top10Transactions = accountService.getLastTransaction(userId);
+        List<Transaction> top10Transactions = transactionService.getLastTransaction(userId);
 
         BigDecimal amount = accounts.stream()
                 .map(Account::getBalance)
@@ -144,7 +146,7 @@ public class AccountController {
                                          Authentication auth, Model model) {
         model.addAttribute("username", auth.getName());
 
-        List<Transaction> transactions = accountService.getAccountTransaction(accountNumber);
+        List<Transaction> transactions = transactionService.getAccountTransaction(accountNumber);
 
         model.addAttribute("transactions", transactions);
 
