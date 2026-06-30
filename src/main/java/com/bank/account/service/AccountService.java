@@ -172,13 +172,27 @@ public class AccountService {
         log.info("Withdraw for the account {} for the amount {}: new balance {}", accountNumber, amount, newBalance);
     }
 
-    @Transactional
+    @Transactional(propagation = Propagation.NEVER)
     public void transfer(String fromAccountNumber, String toAccountNumber, BigDecimal amount) {
+        int retries = 3;
+        while (retries-- > 0) {
+            try {
+                transferInternal(fromAccountNumber, toAccountNumber, amount);
+                return;
+            } catch (OptimisticLockingFailureException e) {
+                if (retries == 0) throw e;
+                try { Thread.sleep(100); } catch (InterruptedException ignored) {}
+            }
+        }
+    }
+
+    @Transactional
+    public void transferInternal(String fromAccountNumber, String toAccountNumber, BigDecimal amount) {
         if (fromAccountNumber.equals(toAccountNumber)) {
-            throw new IllegalArgumentException("Нельзя перевести на тот же счет");
+            throw new IllegalArgumentException("Transfers to the same account cannot be made");
         }
         if (amount.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new IllegalArgumentException("Сумма перевода должна быть положительной");
+            throw new IllegalArgumentException("Transfer amount must be positive");
         }
 
         Account from = getAccount(fromAccountNumber);
@@ -206,10 +220,12 @@ public class AccountService {
         accountRepository.save(to);
 
         transactionService.createTransaction(from, amount, TransactionType.TRANSFER_OUT,
-                "Перевод на счет " + toAccountNumber, fromNewBalance);
+                "Transfer to account " + toAccountNumber, fromNewBalance);
+
         transactionService.createTransaction(to, amount, TransactionType.TRANSFER_IN,
-                "Перевод со счета " + fromAccountNumber, toNewBalance);
-        log.info("Перевод {} со счета {} на счет {} выполнен",
+                "Transfer from account " + fromAccountNumber, toNewBalance);
+
+        log.info("Transfer {} from account {} to account {} completed",
                 amount, fromAccountNumber, toAccountNumber);
     }
 
