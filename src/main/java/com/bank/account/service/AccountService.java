@@ -112,7 +112,7 @@ public class AccountService {
     @Transactional
     public void depositInternal(String accountNumber, BigDecimal amount) {
         if (amount.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new IllegalArgumentException("Сумма пополнения должна быть положительной");
+            throw new IllegalArgumentException("Deposit amount must be positive");
         }
 
         Account account = getAccount(accountNumber);
@@ -130,15 +130,29 @@ public class AccountService {
         accountRepository.save(account);
 
         transactionService.createTransaction(account, amount, TransactionType.DEPOSIT,
-                "Пополнение счета " + accountNumber + " на сумму " + amount, newBalance);
-        log.info("Пополнение счета {} на {}: новый баланс {}", accountNumber, amount, newBalance);
+                "Deposit account " + accountNumber + " for the amount " + amount, newBalance);
 
+        log.info("Deposit account {} for the amount {}: new balance {}", accountNumber, amount, newBalance);
+    }
+
+    @Transactional(propagation = Propagation.NEVER)
+    public void withdraw(String accountNumber, BigDecimal amount) {
+        int retries = 3;
+        while (retries-- > 0) {
+            try {
+                withdrawInternal(accountNumber, amount);
+                return;
+            } catch (OptimisticLockingFailureException e) {
+                if (retries == 0) throw e;
+                try { Thread.sleep(100); } catch (InterruptedException ignored) {}
+            }
+        }
     }
 
     @Transactional
-    public void withdraw(String accountNumber, BigDecimal amount) {
+    public void withdrawInternal(String accountNumber, BigDecimal amount) {
         if (amount.compareTo(BigDecimal.ZERO) <= 0) {
-            throw new IllegalArgumentException("Сумма снятия должна быть положительной");
+            throw new IllegalArgumentException("Withdraw amount must be positive");
         }
 
         Account account = getAccount(accountNumber);
@@ -153,8 +167,9 @@ public class AccountService {
         accountRepository.save(account);
 
         transactionService.createTransaction(account, amount, TransactionType.WITHDRAWAL,
-                "Снятие со счета " + account.getAccountNumber() + " на сумму " + amount, newBalance);
-        log.info("Снятие со счёта {} суммы {}: новый баланс {}", accountNumber, amount, newBalance);
+                "Withdraw for the account " + account.getAccountNumber() + " for the amount " + amount, newBalance);
+
+        log.info("Withdraw for the account {} for the amount {}: new balance {}", accountNumber, amount, newBalance);
     }
 
     @Transactional
