@@ -10,7 +10,9 @@ import com.bank.user.model.User;
 import com.bank.account.repository.AccountRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
@@ -26,7 +28,6 @@ import java.util.UUID;
 @RequiredArgsConstructor
 // Business logic of accounts
 public class AccountService {
-
     private final AccountRepository accountRepository;
     private final SavingsAccountRepository savingsAccountRepository;
     private final CreditAccountRepository creditAccountRepository;
@@ -94,8 +95,22 @@ public class AccountService {
         return accountRepository.findByUserId(userId);
     }
 
-    @Transactional
+    @Transactional(propagation = Propagation.NEVER)
     public void deposit(String accountNumber, BigDecimal amount) {
+        int retries = 3;
+        while (retries-- > 0) {
+            try {
+                depositInternal(accountNumber, amount);
+                return;
+            } catch (OptimisticLockingFailureException e) {
+                if (retries == 0) throw e;
+                try { Thread.sleep(100); } catch (InterruptedException ignored) {}
+            }
+        }
+    }
+
+    @Transactional
+    public void depositInternal(String accountNumber, BigDecimal amount) {
         if (amount.compareTo(BigDecimal.ZERO) <= 0) {
             throw new IllegalArgumentException("Сумма пополнения должна быть положительной");
         }
